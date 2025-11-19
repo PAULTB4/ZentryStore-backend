@@ -140,13 +140,37 @@ El archivo JAR se generará en `target/zentrystore-0.0.1-SNAPSHOT.jar`
 
 - [Estructura del Backend](docs/architecture/BACKEND_STRUCTURE.md)
 - [Configuración de Variables de Entorno](docs/setup/ENV_SETUP.md)
+- [Guía de Git Flow](docs/setup/GIT_FLOW.md)
 
 ## 🤝 Contribuir
 
-1. Crea una rama feature: `git checkout -b feature/nueva-funcionalidad`
-2. Commit tus cambios: `git commit -am 'Agrega nueva funcionalidad'`
-3. Push a la rama: `git push origin feature/nueva-funcionalidad`
-4. Crea un Pull Request
+Este proyecto usa **Git Flow**. Lee la [Guía de Git Flow](docs/setup/GIT_FLOW.md) para más detalles.
+
+### Workflow Rápido:
+
+```bash
+# 1. Crear feature desde develop
+git checkout develop
+git pull origin develop
+git checkout -b feature/nueva-funcionalidad
+
+# 2. Trabajar y hacer commits
+git add .
+git commit -m "feat: descripción del cambio"
+
+# 3. Terminar feature
+git checkout develop
+git merge feature/nueva-funcionalidad
+git push origin develop
+git branch -d feature/nueva-funcionalidad
+```
+
+### Convenciones de Commits:
+- `feat:` Nueva funcionalidad
+- `fix:` Corrección de bug
+- `docs:` Actualización de documentación
+- `refactor:` Refactorización de código
+- `test:` Tests
 
 ## 📄 Licencia
 
