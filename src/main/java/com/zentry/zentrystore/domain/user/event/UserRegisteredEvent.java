@@ -1,0 +1,44 @@
+package com.zentry.zentrystore.domain.user.event;
+
+import java.time.LocalDateTime;
+
+public class UserRegisteredEvent {
+
+    private final Long userId;
+    private final String username;
+    private final String email;
+    private final LocalDateTime occurredOn;
+
+    public UserRegisteredEvent(Long userId, String username, String email) {
+        this.userId = userId;
+        this.username = username;
+        this.email = email;
+        this.occurredOn = LocalDateTime.now();
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public LocalDateTime getOccurredOn() {
+        return occurredOn;
+    }
+
+    @Override
+    public String toString() {
+        return "UserRegisteredEvent{" +
+                "userId=" + userId +
+                ", username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                ", occurredOn=" + occurredOn +
+                '}';
+    }
+}

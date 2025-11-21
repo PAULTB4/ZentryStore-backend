@@ -8,7 +8,7 @@ Este proyecto utiliza un archivo `.env` para configurar variables sensibles que 
 
 1. **Copia el archivo de ejemplo:**
    ```bash
-   cp .env.example .env
+   cp .env .env
    ```
 
 2. **Edita el archivo `.env` con tus valores reales:**
