@@ -23,7 +23,7 @@ public class InvalidCredentialsException extends RuntimeException {
     }
 
     public static InvalidCredentialsException forAccountLocked() {
-        return new InvalidCredentialsException("Account is locked or deactivated");
+        return new InvalidCredentialsException("Account is locked or deactivated, verified");
     }
 
     public static InvalidCredentialsException forEmailNotVerified() {
