@@ -41,7 +41,7 @@ CREATE DATABASE zentrystore;
 Copia el archivo de ejemplo y configura tus valores:
 
 ```bash
-cp .env.example .env
+cp .env .env
 ```
 
 Edita el archivo `.env` con tus configuraciones:
