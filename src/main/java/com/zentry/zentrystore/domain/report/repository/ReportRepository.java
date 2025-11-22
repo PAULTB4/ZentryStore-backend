@@ -1,6 +1,8 @@
 package com.zentry.zentrystore.domain.report.repository;
 
 import com.zentry.zentrystore.domain.report.model.Report;
+import com.zentry.zentrystore.domain.report.model.ReportStatus;
+import com.zentry.zentrystore.domain.report.model.ReportType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -147,4 +149,26 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
     @Query("DELETE FROM Report r WHERE r.status IN ('RESOLVED', 'REJECTED') " +
             "AND r.reviewedAt < :cutoffDate")
     void deleteResolvedReportsOlderThan(@Param("cutoffDate") LocalDateTime cutoffDate);
+
+
+    // Buscar por estado
+    List<Report> findByStatus(ReportStatus status);
+
+    // Buscar por tipo de reporte
+    List<Report> findByType(ReportType type);
+
+    // Buscar por entidad reportada
+    @Query("SELECT r FROM Report r WHERE r.reportedEntityType = :entityType AND r.reportedEntityId = :entityId")
+    List<Report> findByReportedEntity(@Param("entityType") String entityType,
+                                      @Param("entityId") Long entityId);
+
+    // Contar por entidad reportada
+    @Query("SELECT COUNT(r) FROM Report r WHERE r.reportedEntityType = :entityType AND r.reportedEntityId = :entityId")
+    Long countByReportedEntity(@Param("entityType") String entityType,
+                               @Param("entityId") Long entityId);
+
+    // Verificar si existe reporte duplicado
+    boolean existsByReporterIdAndReportedEntityIdAndType(Long reporterId,
+                                                         Long reportedEntityId,
+                                                         ReportType type);
 }
