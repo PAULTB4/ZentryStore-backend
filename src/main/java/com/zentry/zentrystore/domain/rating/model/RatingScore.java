@@ -139,4 +139,31 @@ public class RatingScore {
     public void setValueForMoneyScore(Integer valueForMoneyScore) {
         this.valueForMoneyScore = valueForMoneyScore;
     }
+    public Double getAverageScore() {
+        int count = 0;
+        int total = 0;
+
+        if (overallScore != null) {
+            total += overallScore;
+            count++;
+        }
+        if (communicationScore != null) {
+            total += communicationScore;
+            count++;
+        }
+        if (productQualityScore != null) {
+            total += productQualityScore;
+            count++;
+        }
+        if (deliveryScore != null) {
+            total += deliveryScore;
+            count++;
+        }
+        if (valueForMoneyScore != null) {
+            total += valueForMoneyScore;
+            count++;
+        }
+
+        return count > 0 ? (double) total / count : 0.0;
+    }
 }

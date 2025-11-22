@@ -28,6 +28,11 @@ public class Report {
     @JoinColumn(name = "reporter_id", nullable = false)
     private User reporter;
 
+    @NotNull(message = "Report type is required")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false, length = 50)
+    private ReportType type;
+
     @NotNull(message = "Reported entity ID is required")
     @Column(name = "reported_entity_id", nullable = false)
     private Long reportedEntityId;
@@ -39,15 +44,17 @@ public class Report {
     @NotBlank(message = "Reason is required")
     @Size(max = 100, message = "Reason must not exceed 100 characters")
     @Column(nullable = false, length = 100)
-    private String reason; // SPAM, INAPPROPRIATE_CONTENT, FRAUD, HARASSMENT, etc.
+    private String reason; // Descripción textual del motivo
 
     @NotBlank(message = "Description is required")
     @Size(max = 1000, message = "Description must not exceed 1000 characters")
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
+    @NotNull(message = "Status is required")
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private String status = "PENDING"; // PENDING, UNDER_REVIEW, RESOLVED, REJECTED
+    private ReportStatus status = ReportStatus.PENDING;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reviewed_by")
@@ -77,24 +84,42 @@ public class Report {
     public Report() {
     }
 
-    public Report(User reporter, Long reportedEntityId, String reportedEntityType,
-                  String reason, String description) {
+    public Report(User reporter, ReportType type, String reportedEntityType,
+                  Long reportedEntityId, String reason, String description) {
         this.reporter = reporter;
-        this.reportedEntityId = reportedEntityId;
+        this.type = type;
         this.reportedEntityType = reportedEntityType;
+        this.reportedEntityId = reportedEntityId;
         this.reason = reason;
         this.description = description;
+        this.status = ReportStatus.PENDING;
     }
 
     // Business methods
+    public void review() {
+        this.status = ReportStatus.UNDER_REVIEW;
+    }
+
+    public void resolve(String moderatorNotes) {
+        this.status = ReportStatus.RESOLVED;
+        this.reviewNotes = moderatorNotes;
+        this.reviewedAt = LocalDateTime.now();
+    }
+
+    public void dismiss(String moderatorNotes) {
+        this.status = ReportStatus.DISMISSED;
+        this.reviewNotes = moderatorNotes;
+        this.reviewedAt = LocalDateTime.now();
+    }
+
     public void markAsUnderReview(User reviewer) {
-        this.status = "UNDER_REVIEW";
+        this.status = ReportStatus.UNDER_REVIEW;
         this.reviewedBy = reviewer;
         this.reviewedAt = LocalDateTime.now();
     }
 
     public void resolve(User reviewer, String notes, String actionTaken) {
-        this.status = "RESOLVED";
+        this.status = ReportStatus.RESOLVED;
         this.reviewedBy = reviewer;
         this.reviewNotes = notes;
         this.actionTaken = actionTaken;
@@ -102,7 +127,7 @@ public class Report {
     }
 
     public void reject(User reviewer, String notes) {
-        this.status = "REJECTED";
+        this.status = ReportStatus.DISMISSED;
         this.reviewedBy = reviewer;
         this.reviewNotes = notes;
         this.reviewedAt = LocalDateTime.now();
@@ -117,19 +142,19 @@ public class Report {
     }
 
     public boolean isPending() {
-        return "PENDING".equals(this.status);
+        return ReportStatus.PENDING.equals(this.status);
     }
 
     public boolean isUnderReview() {
-        return "UNDER_REVIEW".equals(this.status);
+        return ReportStatus.UNDER_REVIEW.equals(this.status);
     }
 
     public boolean isResolved() {
-        return "RESOLVED".equals(this.status);
+        return ReportStatus.RESOLVED.equals(this.status);
     }
 
     public boolean isRejected() {
-        return "REJECTED".equals(this.status);
+        return ReportStatus.DISMISSED.equals(this.status);
     }
 
     public boolean isHighPriority() {
@@ -159,6 +184,14 @@ public class Report {
 
     public void setReporter(User reporter) {
         this.reporter = reporter;
+    }
+
+    public ReportType getType() {
+        return type;
+    }
+
+    public void setType(ReportType type) {
+        this.type = type;
     }
 
     public Long getReportedEntityId() {
@@ -193,11 +226,11 @@ public class Report {
         this.description = description;
     }
 
-    public String getStatus() {
+    public ReportStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(ReportStatus status) {
         this.status = status;
     }
 
@@ -255,5 +288,13 @@ public class Report {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String getModeratorNotes() {
+        return reviewNotes;
+    }
+
+    public LocalDateTime getResolvedAt() {
+        return reviewedAt;
     }
 }
