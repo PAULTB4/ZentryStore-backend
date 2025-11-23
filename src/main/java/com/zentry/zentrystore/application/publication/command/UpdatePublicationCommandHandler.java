@@ -28,9 +28,9 @@ public class UpdatePublicationCommandHandler {
                 .orElseThrow(() -> PublicationNotFoundException.byId(command.getPublicationId()));
 
         // Verificar que el usuario sea el dueño
-        if (!publication.getUser().getId().equals(command.getUserId())) {
-            throw new IllegalArgumentException("User is not the owner of this publication");
-        }
+        //if (!publication.getUser().getId().equals(command.getUserId())) {
+         //   throw new IllegalArgumentException("User is not the owner of this publication");
+        //}
 
         // Verificar que se pueda editar
         if (!publication.canBeEdited()) {

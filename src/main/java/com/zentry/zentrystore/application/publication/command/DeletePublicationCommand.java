@@ -3,18 +3,10 @@ package com.zentry.zentrystore.application.publication.command;
 public class DeletePublicationCommand {
 
     private final Long publicationId;
-    private final Long userId;
 
-    public DeletePublicationCommand(Long publicationId, Long userId) {
+    public DeletePublicationCommand(Long publicationId) {
         this.publicationId = publicationId;
-        this.userId = userId;
     }
 
-    public Long getPublicationId() {
-        return publicationId;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
+    public Long getPublicationId() { return publicationId; }
 }

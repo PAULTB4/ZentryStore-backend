@@ -1,6 +1,7 @@
 package com.zentry.zentrystore.application.user.query;
 
-import com.zentry.zentrystore.application.user.dto.UserDTO;
+import com.zentry.zentrystore.application.user.dto.response.UserResponse;
+import com.zentry.zentrystore.application.user.mapper.UserMapper;
 import com.zentry.zentrystore.domain.user.exception.UserNotFoundException;
 import com.zentry.zentrystore.domain.user.model.User;
 import com.zentry.zentrystore.domain.user.repository.UserRepository;
@@ -12,16 +13,17 @@ import org.springframework.transaction.annotation.Transactional;
 public class GetUserByIdQueryHandler {
 
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
-    public GetUserByIdQueryHandler(UserRepository userRepository) {
+    public GetUserByIdQueryHandler(UserRepository userRepository, UserMapper userMapper) {
         this.userRepository = userRepository;
+        this.userMapper = userMapper;
     }
 
-    public UserDTO handle(GetUserByIdQuery query) {
+    public UserResponse handle(GetUserByIdQuery query) {
         User user = userRepository.findById(query.getUserId())
-                .orElseThrow(() -> UserNotFoundException.byId(query.getUserId()));
+                .orElseThrow(() -> new UserNotFoundException(query.getUserId()));
 
-        // TODO: Mapear a DTO cuando tengamos mapper
-        return null;
+        return userMapper.toResponse(user);
     }
 }

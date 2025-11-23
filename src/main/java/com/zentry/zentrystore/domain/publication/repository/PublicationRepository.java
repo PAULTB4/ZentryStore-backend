@@ -2,6 +2,7 @@ package com.zentry.zentrystore.domain.publication.repository;
 
 import com.zentry.zentrystore.domain.publication.model.Publication;
 import com.zentry.zentrystore.domain.publication.model.PublicationStatus;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -132,4 +133,12 @@ public interface PublicationRepository extends JpaRepository<Publication, Long> 
     @Query("SELECT CASE WHEN COUNT(p) > 0 THEN true ELSE false END FROM Publication p " +
             "WHERE p.user.id = :userId AND p.status = 'ACTIVE'")
     boolean userHasActivePublications(@Param("userId") Long userId);
+
+    // Agregar estos métodos a PublicationRepository
+
+    @Query("SELECT p FROM Publication p WHERE p.status = 'ACTIVE' ORDER BY p.createdAt DESC")
+    List<Publication> findRecentPublications(Pageable pageable);
+
+    @Query("SELECT p FROM Publication p WHERE p.location.city = :city AND (:state IS NULL OR p.location.state = :state) AND p.status = 'ACTIVE'")
+    List<Publication> findByLocation(@Param("city") String city, @Param("state") String state);
 }

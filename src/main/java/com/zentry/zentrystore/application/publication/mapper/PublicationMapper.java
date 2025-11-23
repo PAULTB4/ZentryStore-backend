@@ -148,4 +148,67 @@ public class PublicationMapper {
                 .map(this::toCategoryDTO)
                 .collect(Collectors.toList());
     }
+
+    public PublicationResponse toResponse(Publication publication) {
+        if (publication == null) {
+            return null;
+        }
+
+        PublicationResponse response = new PublicationResponse();
+        response.setId(publication.getId());
+        response.setTitle(publication.getTitle());
+        response.setDescription(publication.getDescription());
+
+        if (publication.getStatus() != null) {
+            response.setStatus(publication.getStatus().name());
+        }
+
+        // Seller info
+        if (publication.getUser() != null) {
+            response.setSellerId(publication.getUser().getId());
+            response.setSellerUsername(publication.getUser().getUsername());
+        }
+
+        // Category info
+        if (publication.getCategory() != null) {
+            response.setCategoryId(publication.getCategory().getId());
+            response.setCategoryName(publication.getCategory().getName());
+        }
+
+        // Price info
+        if (publication.getPrice() != null) {
+            response.setPrice(publication.getPrice().getAmount());
+            response.setCurrency(publication.getPrice().getCurrency());
+        }
+
+        // Location info
+        if (publication.getLocation() != null) {
+            response.setCity(publication.getLocation().getCity());
+            response.setState(publication.getLocation().getState());
+            response.setCountry(publication.getLocation().getCountry());
+            response.setPostalCode(publication.getLocation().getPostalCode());
+            response.setAddress(publication.getLocation().getAddress());
+            response.setLatitude(publication.getLocation().getLatitude());
+            response.setLongitude(publication.getLocation().getLongitude());
+        }
+
+        // Images
+        if (publication.getImages() != null) {
+            response.setImageUrls(publication.getImages().stream()
+                    .map(ProductImage::getImageUrl)
+                    .collect(Collectors.toList()));
+        }
+
+        // Additional fields
+        response.setCondition(publication.getCondition());
+        response.setAvailableQuantity(publication.getAvailableQuantity());
+        response.setIsNegotiable(publication.getIsNegotiable());
+        response.setAllowsShipping(publication.getAllowsShipping());
+
+        // Timestamps
+        response.setCreatedAt(publication.getCreatedAt());
+        response.setUpdatedAt(publication.getUpdatedAt());
+
+        return response;
+    }
 }
