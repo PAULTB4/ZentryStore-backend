@@ -6,7 +6,6 @@ import java.util.List;
 public class UpdatePublicationCommand {
 
     private final Long publicationId;
-    private final Long userId;
     private final String title;
     private final String description;
     private final Long categoryId;
@@ -25,7 +24,7 @@ public class UpdatePublicationCommand {
     private final Double longitude;
     private final List<String> imageUrls;
 
-    public UpdatePublicationCommand(Long publicationId, Long userId, String title,
+    public UpdatePublicationCommand(Long publicationId, String title,
                                     String description, Long categoryId, BigDecimal price,
                                     String currency, String condition, Integer availableQuantity,
                                     Boolean isNegotiable, Boolean allowsShipping,
@@ -34,7 +33,6 @@ public class UpdatePublicationCommand {
                                     Double latitude, Double longitude,
                                     List<String> imageUrls) {
         this.publicationId = publicationId;
-        this.userId = userId;
         this.title = title;
         this.description = description;
         this.categoryId = categoryId;
@@ -54,80 +52,22 @@ public class UpdatePublicationCommand {
         this.imageUrls = imageUrls;
     }
 
-    // Getters
-    public Long getPublicationId() {
-        return publicationId;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public Long getCategoryId() {
-        return categoryId;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public String getCurrency() {
-        return currency;
-    }
-
-    public String getCondition() {
-        return condition;
-    }
-
-    public Integer getAvailableQuantity() {
-        return availableQuantity;
-    }
-
-    public Boolean getIsNegotiable() {
-        return isNegotiable;
-    }
-
-    public Boolean getAllowsShipping() {
-        return allowsShipping;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public String getState() {
-        return state;
-    }
-
-    public String getCountry() {
-        return country;
-    }
-
-    public String getPostalCode() {
-        return postalCode;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public Double getLatitude() {
-        return latitude;
-    }
-
-    public Double getLongitude() {
-        return longitude;
-    }
-
-    public List<String> getImageUrls() {
-        return imageUrls;
-    }
+    public Long getPublicationId() { return publicationId; }
+    public String getTitle() { return title; }
+    public String getDescription() { return description; }
+    public Long getCategoryId() { return categoryId; }
+    public BigDecimal getPrice() { return price; }
+    public String getCurrency() { return currency; }
+    public String getCondition() { return condition; }
+    public Integer getAvailableQuantity() { return availableQuantity; }
+    public Boolean getIsNegotiable() { return isNegotiable; }
+    public Boolean getAllowsShipping() { return allowsShipping; }
+    public String getCity() { return city; }
+    public String getState() { return state; }
+    public String getCountry() { return country; }
+    public String getPostalCode() { return postalCode; }
+    public String getAddress() { return address; }
+    public Double getLatitude() { return latitude; }
+    public Double getLongitude() { return longitude; }
+    public List<String> getImageUrls() { return imageUrls; }
 }

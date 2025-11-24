@@ -6,7 +6,7 @@ public class ChangePublicationStatusCommand {
     private final Long userId;
     private final String newStatus; // ACTIVE, PAUSED, INACTIVE, SOLD
 
-    public ChangePublicationStatusCommand(Long publicationId, Long userId, String newStatus) {
+    public ChangePublicationStatusCommand(Long publicationId,Long userId, String newStatus) {
         this.publicationId = publicationId;
         this.userId = userId;
         this.newStatus = newStatus;

@@ -1,6 +1,7 @@
 package com.zentry.zentrystore.application.publication.command;
 
-import com.zentry.zentrystore.application.publication.dto.PublicationDTO;
+import com.zentry.zentrystore.application.publication.dto.PublicationResponse;
+import com.zentry.zentrystore.application.publication.mapper.PublicationMapper;
 import com.zentry.zentrystore.domain.publication.exception.InvalidPublicationDataException;
 import com.zentry.zentrystore.domain.publication.model.*;
 import com.zentry.zentrystore.domain.publication.repository.CategoryRepository;
@@ -17,17 +18,20 @@ public class CreatePublicationCommandHandler {
     private final PublicationRepository publicationRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final PublicationMapper publicationMapper;
 
     public CreatePublicationCommandHandler(PublicationRepository publicationRepository,
                                            UserRepository userRepository,
-                                           CategoryRepository categoryRepository) {
+                                           CategoryRepository categoryRepository,
+                                           PublicationMapper publicationMapper) {
         this.publicationRepository = publicationRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
+        this.publicationMapper = publicationMapper;
     }
 
     @Transactional
-    public PublicationDTO handle(CreatePublicationCommand command) {
+    public PublicationResponse handle(CreatePublicationCommand command) {
         // Validar usuario
         User user = userRepository.findById(command.getUserId())
                 .orElseThrow(() -> UserNotFoundException.byId(command.getUserId()));
@@ -89,7 +93,7 @@ public class CreatePublicationCommandHandler {
 
         // TODO: Publicar evento PublicationCreatedEvent
 
-        // Retornar DTO
-        return null; // TODO: Mapear cuando tengamos mapper
+        // Retornar Response
+        return publicationMapper.toResponse(savedPublication);
     }
 }

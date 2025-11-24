@@ -2,6 +2,7 @@ package com.zentry.zentrystore.domain.publication.repository;
 
 import com.zentry.zentrystore.domain.publication.model.Publication;
 import com.zentry.zentrystore.domain.publication.model.PublicationStatus;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -10,7 +11,6 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface PublicationRepository extends JpaRepository<Publication, Long> {
@@ -57,7 +57,7 @@ public interface PublicationRepository extends JpaRepository<Publication, Long> 
                                                 @Param("maxPrice") BigDecimal maxPrice,
                                                 @Param("status") PublicationStatus status);
 
-    // Búsquedas por ubicación
+    // Búsquedas por ubicación (con @Embedded es directo)
     @Query("SELECT p FROM Publication p WHERE p.location.city = :city")
     List<Publication> findByCity(@Param("city") String city);
 
@@ -88,8 +88,12 @@ public interface PublicationRepository extends JpaRepository<Publication, Long> 
     @Query("SELECT p FROM Publication p WHERE p.expiresAt < :now AND p.status = 'ACTIVE'")
     List<Publication> findExpiredPublications(@Param("now") LocalDateTime now);
 
-    // Ordenamiento y paginación
-    @Query("SELECT p FROM Publication p WHERE p.status = 'ACTIVE' ORDER BY p.createdAt DESC")
+    // Ordenamiento y paginación con FETCH
+    @Query("SELECT DISTINCT p FROM Publication p " +
+            "LEFT JOIN FETCH p.user " +
+            "LEFT JOIN FETCH p.category " +
+            "WHERE p.status = 'ACTIVE' " +
+            "ORDER BY p.createdAt DESC")
     List<Publication> findRecentActivePublications();
 
     @Query("SELECT p FROM Publication p WHERE p.status = 'ACTIVE' ORDER BY p.viewCount DESC")
@@ -99,7 +103,8 @@ public interface PublicationRepository extends JpaRepository<Publication, Long> 
     List<Publication> findMostFavoritedPublications();
 
     // Búsquedas complejas
-    @Query("SELECT p FROM Publication p WHERE p.status = 'ACTIVE' " +
+    @Query("SELECT p FROM Publication p " +
+            "WHERE p.status = 'ACTIVE' " +
             "AND p.category.id = :categoryId " +
             "AND p.price.amount >= :minPrice AND p.price.amount <= :maxPrice " +
             "AND p.location.city = :city")
@@ -132,4 +137,19 @@ public interface PublicationRepository extends JpaRepository<Publication, Long> 
     @Query("SELECT CASE WHEN COUNT(p) > 0 THEN true ELSE false END FROM Publication p " +
             "WHERE p.user.id = :userId AND p.status = 'ACTIVE'")
     boolean userHasActivePublications(@Param("userId") Long userId);
+
+    // QUERY PRINCIPAL: Para publicaciones recientes
+    @Query("SELECT DISTINCT p FROM Publication p " +
+            "LEFT JOIN FETCH p.user " +
+            "LEFT JOIN FETCH p.category " +
+            "WHERE p.status = 'ACTIVE' " +
+            "ORDER BY p.createdAt DESC")
+    List<Publication> findRecentPublications(Pageable pageable);
+
+    // Búsqueda por ubicación
+    @Query("SELECT p FROM Publication p " +
+            "WHERE p.location.city = :city " +
+            "AND (:state IS NULL OR p.location.state = :state) " +
+            "AND p.status = 'ACTIVE'")
+    List<Publication> findByLocation(@Param("city") String city, @Param("state") String state);
 }

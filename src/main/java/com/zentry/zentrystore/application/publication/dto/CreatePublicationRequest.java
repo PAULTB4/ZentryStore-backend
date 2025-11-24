@@ -7,6 +7,9 @@ import java.util.List;
 
 public class CreatePublicationRequest {
 
+    @NotNull(message = "Seller ID is required")
+    private Long sellerId;
+
     @NotBlank(message = "Title is required")
     @Size(min = 5, max = 200, message = "Title must be between 5 and 200 characters")
     private String title;
@@ -185,5 +188,13 @@ public class CreatePublicationRequest {
 
     public void setImageUrls(List<String> imageUrls) {
         this.imageUrls = imageUrls;
+    }
+
+    public Long getSellerId() {
+        return sellerId;
+    }
+
+    public void setSellerId(Long sellerId) {
+        this.sellerId = sellerId;
     }
 }

@@ -33,7 +33,7 @@ public class User {
     private String email;
 
     @NotBlank(message = "Password is required")
-    @Column(nullable = false)
+    @Column(name = "password_hash", nullable = false)
     private String password;
 
     @Column(nullable = false)
