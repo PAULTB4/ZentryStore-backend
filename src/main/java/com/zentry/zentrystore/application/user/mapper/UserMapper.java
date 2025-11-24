@@ -2,6 +2,7 @@ package com.zentry.zentrystore.application.user.mapper;
 
 import com.zentry.zentrystore.application.user.dto.UserDTO;
 import com.zentry.zentrystore.application.user.dto.UserProfileDTO;
+import com.zentry.zentrystore.application.user.dto.response.UserResponse;
 import com.zentry.zentrystore.domain.user.model.User;
 import com.zentry.zentrystore.domain.user.model.UserProfile;
 import com.zentry.zentrystore.domain.user.model.UserRole;
@@ -11,6 +12,34 @@ import java.util.stream.Collectors;
 
 @Component
 public class UserMapper {
+
+    // ============ TO RESPONSE (para API) ============
+
+    public UserResponse toResponse(User user) {
+        if (user == null) {
+            return null;
+        }
+
+        UserResponse response = new UserResponse();
+        response.setId(user.getId());
+        response.setUsername(user.getUsername());
+        response.setEmail(user.getEmail());
+        response.setActive(user.getActive());
+        response.setEmailVerified(user.getEmailVerified());
+        response.setCreatedAt(user.getCreatedAt());
+        response.setLastLoginAt(user.getLastLoginAt());
+
+        // Mapear roles
+        if (user.getRoles() != null) {
+            response.setRoles(user.getRoles().stream()
+                    .map(UserRole::getName)
+                    .collect(Collectors.toSet()));
+        }
+
+        return response;
+    }
+
+    // ============ TO DTO (para uso interno) ============
 
     public UserDTO toDTO(User user) {
         if (user == null) {

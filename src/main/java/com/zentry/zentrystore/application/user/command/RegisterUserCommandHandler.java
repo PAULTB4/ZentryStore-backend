@@ -1,6 +1,6 @@
 package com.zentry.zentrystore.application.user.command;
 
-import com.zentry.zentrystore.application.user.dto.UserDTO;
+import com.zentry.zentrystore.application.user.dto.response.UserResponse;
 import com.zentry.zentrystore.application.user.mapper.UserMapper;
 import com.zentry.zentrystore.domain.user.exception.DuplicateEmailException;
 import com.zentry.zentrystore.domain.user.model.User;
@@ -31,7 +31,7 @@ public class RegisterUserCommandHandler {
     }
 
     @Transactional
-    public UserDTO handle(RegisterUserCommand command) {
+    public UserResponse handle(RegisterUserCommand command) {
         // Validar que el email no exista
         if (userRepository.existsByEmail(command.getEmail())) {
             throw DuplicateEmailException.forEmail(command.getEmail());
@@ -64,7 +64,7 @@ public class RegisterUserCommandHandler {
         // TODO: Publicar evento UserRegisteredEvent
         // TODO: Enviar email de verificación
 
-        // Retornar DTO
-        return userMapper.toDTO(savedUser);
+        // Retornar Response
+        return userMapper.toResponse(savedUser);
     }
 }
