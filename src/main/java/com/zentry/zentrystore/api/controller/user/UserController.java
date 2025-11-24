@@ -1,10 +1,12 @@
 package com.zentry.zentrystore.api.controller.user;
 
-import com.zentry.zentrystore.application.user.command.DeleteUserCommand;
-import com.zentry.zentrystore.application.user.command.DeleteUserCommandHandler;
+import com.zentry.zentrystore.application.user.command.*;
 import com.zentry.zentrystore.application.user.dto.UserDTO;
+import com.zentry.zentrystore.application.user.dto.request.ChangePasswordRequest;
 import com.zentry.zentrystore.application.user.dto.response.UserResponse;
+import com.zentry.zentrystore.application.user.dto.response.UserStatisticsResponse;
 import com.zentry.zentrystore.application.user.query.*;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,12 +16,18 @@ import java.util.List;
 @RequestMapping("/api/users")
 public class UserController {
 
+    // Query Handlers
     private final GetUserByIdQueryHandler getUserByIdQueryHandler;
     private final GetUserByEmailQueryHandler getUserByEmailQueryHandler;
     private final GetUserByUsernameQueryHandler getUserByUsernameQueryHandler;
     private final GetActiveUsersQueryHandler getActiveUsersQueryHandler;
     private final SearchUsersQueryHandler searchUsersQueryHandler;
+    private final GetUserStatisticsQueryHandler getUserStatisticsQueryHandler;
+
+    // Command Handlers
     private final DeleteUserCommandHandler deleteUserCommandHandler;
+    private final ChangePasswordCommandHandler changePasswordCommandHandler;
+    private final VerifyEmailCommandHandler verifyEmailCommandHandler;
 
     public UserController(
             GetUserByIdQueryHandler getUserByIdQueryHandler,
@@ -27,14 +35,24 @@ public class UserController {
             GetUserByUsernameQueryHandler getUserByUsernameQueryHandler,
             GetActiveUsersQueryHandler getActiveUsersQueryHandler,
             SearchUsersQueryHandler searchUsersQueryHandler,
-            DeleteUserCommandHandler deleteUserCommandHandler) {
+            GetUserStatisticsQueryHandler getUserStatisticsQueryHandler,
+            DeleteUserCommandHandler deleteUserCommandHandler,
+            ChangePasswordCommandHandler changePasswordCommandHandler,
+            VerifyEmailCommandHandler verifyEmailCommandHandler) {
         this.getUserByIdQueryHandler = getUserByIdQueryHandler;
         this.getUserByEmailQueryHandler = getUserByEmailQueryHandler;
         this.getUserByUsernameQueryHandler = getUserByUsernameQueryHandler;
         this.getActiveUsersQueryHandler = getActiveUsersQueryHandler;
         this.searchUsersQueryHandler = searchUsersQueryHandler;
+        this.getUserStatisticsQueryHandler = getUserStatisticsQueryHandler;
         this.deleteUserCommandHandler = deleteUserCommandHandler;
+        this.changePasswordCommandHandler = changePasswordCommandHandler;
+        this.verifyEmailCommandHandler = verifyEmailCommandHandler;
     }
+
+    // =============================================
+    // QUERIES (GET)
+    // =============================================
 
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
@@ -69,6 +87,37 @@ public class UserController {
         SearchUsersQuery query = new SearchUsersQuery(keyword);
         List<UserResponse> response = searchUsersQueryHandler.handle(query);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}/statistics")
+    public ResponseEntity<UserStatisticsResponse> getUserStatistics(@PathVariable Long id) {
+        GetUserStatisticsQuery query = new GetUserStatisticsQuery(id);
+        UserStatisticsResponse response = getUserStatisticsQueryHandler.handle(query);
+        return ResponseEntity.ok(response);
+    }
+
+    // =============================================
+    // COMMANDS (POST, PUT, PATCH, DELETE)
+    // =============================================
+
+    @PutMapping("/{id}/password")
+    public ResponseEntity<Void> changePassword(
+            @PathVariable Long id,
+            @Valid @RequestBody ChangePasswordRequest request) {
+        ChangePasswordCommand command = new ChangePasswordCommand(
+                id,
+                request.getCurrentPassword(),
+                request.getNewPassword()
+        );
+        changePasswordCommandHandler.handle(command);
+        return ResponseEntity.ok().build();  // ← Debe ser así
+    }
+
+    @PatchMapping("/{id}/verify-email")
+    public ResponseEntity<Void> verifyEmail(@PathVariable Long id) {
+        VerifyEmailCommand command = new VerifyEmailCommand(id);
+        verifyEmailCommandHandler.handle(command);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")

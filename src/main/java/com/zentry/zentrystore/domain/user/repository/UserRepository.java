@@ -67,4 +67,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT CASE WHEN COUNT(u) > 0 THEN true ELSE false END FROM User u " +
             "WHERE u.passwordResetToken = :token AND u.passwordResetExpiresAt > :now")
     boolean isPasswordResetTokenValid(@Param("token") String token, @Param("now") LocalDateTime now);
+
+    @Query("SELECT u FROM User u WHERE LOWER(u.username) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(u.email) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    List<User> searchByUsernameOrEmail(@Param("keyword") String keyword);
 }

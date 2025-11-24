@@ -17,14 +17,14 @@ public class SearchUsersQueryHandler {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
-    public SearchUsersQueryHandler(UserRepository userRepository, UserMapper userMapper) {
+    public SearchUsersQueryHandler(UserRepository userRepository,
+                                   UserMapper userMapper) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
     }
 
     public List<UserResponse> handle(SearchUsersQuery query) {
-        List<User> users = userRepository.searchUsers(query.getSearchTerm());
-
+        List<User> users = userRepository.searchByUsernameOrEmail(query.getSearchTerm());
         return users.stream()
                 .map(userMapper::toResponse)
                 .collect(Collectors.toList());
