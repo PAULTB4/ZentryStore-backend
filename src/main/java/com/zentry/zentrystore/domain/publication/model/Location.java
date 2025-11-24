@@ -8,27 +8,28 @@ import jakarta.validation.constraints.Size;
 public class Location {
 
     @Size(max = 100, message = "City must not exceed 100 characters")
-    @Column(length = 100)
+    @Column(name = "city", length = 100)
     private String city;
 
     @Size(max = 100, message = "State must not exceed 100 characters")
-    @Column(length = 100)
+    @Column(name = "state", length = 100)
     private String state;
 
     @Size(max = 100, message = "Country must not exceed 100 characters")
-    @Column(length = 100)
+    @Column(name = "country", length = 100)
     private String country;
 
     @Column(name = "postal_code", length = 20)
     private String postalCode;
 
-    @Column(columnDefinition = "TEXT")
+    // ⚠️ CORREGIDO: Especificar nombre de columna explícitamente
+    @Column(name = "address", columnDefinition = "TEXT")
     private String address;
 
-    @Column()
+    @Column(name = "latitude")
     private Double latitude;
 
-    @Column()
+    @Column(name = "longitude")
     private Double longitude;
 
     // Constructors

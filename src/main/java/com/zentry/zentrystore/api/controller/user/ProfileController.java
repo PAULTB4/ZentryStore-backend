@@ -3,9 +3,10 @@ package com.zentry.zentrystore.api.controller.user;
 import com.zentry.zentrystore.application.user.command.UpdateUserProfileCommand;
 import com.zentry.zentrystore.application.user.command.UpdateUserProfileCommandHandler;
 import com.zentry.zentrystore.application.user.dto.request.UpdateProfileRequest;
+import com.zentry.zentrystore.application.user.dto.response.UserProfileResponse;
 import com.zentry.zentrystore.application.user.dto.response.UserResponse;
-import com.zentry.zentrystore.application.user.query.GetUserByIdQuery;
-import com.zentry.zentrystore.application.user.query.GetUserByIdQueryHandler;
+import com.zentry.zentrystore.application.user.query.GetUserProfileQuery;
+import com.zentry.zentrystore.application.user.query.GetUserProfileQueryHandler;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,20 +15,20 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/users/{userId}/profile")
 public class ProfileController {
 
-    private final GetUserByIdQueryHandler getUserByIdQueryHandler;
+    private final GetUserProfileQueryHandler getUserProfileQueryHandler;
     private final UpdateUserProfileCommandHandler updateUserProfileCommandHandler;
 
     public ProfileController(
-            GetUserByIdQueryHandler getUserByIdQueryHandler,
+            GetUserProfileQueryHandler getUserProfileQueryHandler,
             UpdateUserProfileCommandHandler updateUserProfileCommandHandler) {
-        this.getUserByIdQueryHandler = getUserByIdQueryHandler;
+        this.getUserProfileQueryHandler = getUserProfileQueryHandler;
         this.updateUserProfileCommandHandler = updateUserProfileCommandHandler;
     }
 
     @GetMapping
-    public ResponseEntity<UserResponse> getProfile(@PathVariable Long userId) {
-        GetUserByIdQuery query = new GetUserByIdQuery(userId);
-        UserResponse response = getUserByIdQueryHandler.handle(query);
+    public ResponseEntity<UserProfileResponse> getProfile(@PathVariable Long userId) {
+        GetUserProfileQuery query = new GetUserProfileQuery(userId);
+        UserProfileResponse response = getUserProfileQueryHandler.handle(query);
         return ResponseEntity.ok(response);
     }
 
