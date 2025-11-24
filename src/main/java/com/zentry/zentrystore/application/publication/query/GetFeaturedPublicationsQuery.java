@@ -4,6 +4,6 @@ public class GetFeaturedPublicationsQuery {
 
     // Query sin parámetros - obtiene publicaciones destacadas
 
-    public GetFeaturedPublicationsQuery() {
+    public GetFeaturedPublicationsQuery(int limit) {
     }
 }
