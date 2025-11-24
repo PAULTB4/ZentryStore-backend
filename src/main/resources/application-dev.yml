@@ -1,0 +1,51 @@
+spring:
+  main:
+    allow-bean-definition-overriding: true  # ← AGREGAR ESTA LÍNEA
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:zentry_store_dev}
+    username: ${DB_USERNAME:zentry_user}
+    password: ${DB_PASSWORD:zentry_pass}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 20000
+
+  jpa:
+    hibernate:
+      ddl-auto: none # Flyway handles schema
+    show-sql: true
+
+  flyway:
+    enabled: true
+    clean-disabled: false
+
+  mail:
+    host: localhost
+    port: 1025
+    username:
+    password:
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+
+management:
+  health:
+    mail:
+      enabled: false  # Deshabilitar health check de email en desarrollo
+
+logging:
+  level:
+    com.zentry: DEBUG
+    org.springframework.security: DEBUG
+
+# Development specific settings
+app:
+  security:
+    enabled: true
+  email:
+    verification-required: false
