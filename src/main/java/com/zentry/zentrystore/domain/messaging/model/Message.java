@@ -65,6 +65,13 @@ public class Message {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "message_type", length = 20)
+    private MessageType messageType = MessageType.TEXT;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
     // Constructors
     public Message() {
     }
@@ -198,4 +205,30 @@ public class Message {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    // Helper methods para obtener IDs sin cargar entidades completas
+    public Long getSenderId() {
+        return this.sender != null ? this.sender.getId() : null;
+    }
+
+    public Long getConversationId() {
+        return this.conversation != null ? this.conversation.getId() : null;
+    }
+
+    public MessageType getMessageType() {
+        return messageType;
+    }
+
+    public void setMessageType(MessageType messageType) {
+        this.messageType = messageType;
+    }
+
+    public LocalDateTime getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
 }

@@ -14,29 +14,38 @@ import java.util.List;
 public interface MessageRepository extends JpaRepository<Message, Long> {
 
     // Búsquedas por conversación
-    List<Message> findByConversationId(Long conversationId);
+    @Query("SELECT m FROM Message m WHERE m.conversation.id = :conversationId")
+    List<Message> findByConversationId(@Param("conversationId") Long conversationId);
 
-    List<Message> findByConversationIdOrderByCreatedAtAsc(Long conversationId);
+    @Query("SELECT m FROM Message m WHERE m.conversation.id = :conversationId ORDER BY m.createdAt ASC")
+    List<Message> findByConversationIdOrderByCreatedAtAsc(@Param("conversationId") Long conversationId);
 
-    List<Message> findByConversationIdOrderByCreatedAtDesc(Long conversationId);
+    @Query("SELECT m FROM Message m WHERE m.conversation.id = :conversationId ORDER BY m.createdAt DESC")
+    List<Message> findByConversationIdOrderByCreatedAtDesc(@Param("conversationId") Long conversationId);
 
     @Query("SELECT m FROM Message m WHERE m.conversation.id = :conversationId " +
             "ORDER BY m.createdAt DESC")
     List<Message> findRecentMessagesByConversation(@Param("conversationId") Long conversationId);
 
-    Long countByConversationId(Long conversationId);
+    @Query("SELECT COUNT(m) FROM Message m WHERE m.conversation.id = :conversationId")
+    Long countByConversationId(@Param("conversationId") Long conversationId);
 
     // Búsquedas por remitente
-    List<Message> findBySenderId(Long senderId);
+    @Query("SELECT m FROM Message m WHERE m.sender.id = :senderId")
+    List<Message> findBySenderId(@Param("senderId") Long senderId);
 
-    List<Message> findBySenderIdOrderByCreatedAtDesc(Long senderId);
+    @Query("SELECT m FROM Message m WHERE m.sender.id = :senderId ORDER BY m.createdAt DESC")
+    List<Message> findBySenderIdOrderByCreatedAtDesc(@Param("senderId") Long senderId);
 
-    Long countBySenderId(Long senderId);
+    @Query("SELECT COUNT(m) FROM Message m WHERE m.sender.id = :senderId")
+    Long countBySenderId(@Param("senderId") Long senderId);
 
     // Búsquedas por estado
     List<Message> findByStatus(MessageStatus status);
 
-    List<Message> findByConversationIdAndStatus(Long conversationId, MessageStatus status);
+    @Query("SELECT m FROM Message m WHERE m.conversation.id = :conversationId AND m.status = :status")
+    List<Message> findByConversationIdAndStatus(@Param("conversationId") Long conversationId,
+                                                @Param("status") MessageStatus status);
 
     @Query("SELECT m FROM Message m WHERE m.conversation.id = :conversationId " +
             "AND m.status = :status ORDER BY m.createdAt ASC")
@@ -69,11 +78,15 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     Long countMessagesWithAttachmentsByConversation(@Param("conversationId") Long conversationId);
 
     // Búsquedas por fecha
-    List<Message> findByConversationIdAndCreatedAtAfter(Long conversationId, LocalDateTime date);
+    @Query("SELECT m FROM Message m WHERE m.conversation.id = :conversationId AND m.createdAt > :date")
+    List<Message> findByConversationIdAndCreatedAtAfter(@Param("conversationId") Long conversationId,
+                                                        @Param("date") LocalDateTime date);
 
-    List<Message> findByConversationIdAndCreatedAtBetween(Long conversationId,
-                                                          LocalDateTime startDate,
-                                                          LocalDateTime endDate);
+    @Query("SELECT m FROM Message m WHERE m.conversation.id = :conversationId " +
+            "AND m.createdAt BETWEEN :startDate AND :endDate")
+    List<Message> findByConversationIdAndCreatedAtBetween(@Param("conversationId") Long conversationId,
+                                                          @Param("startDate") LocalDateTime startDate,
+                                                          @Param("endDate") LocalDateTime endDate);
 
     @Query("SELECT m FROM Message m WHERE m.conversation.id = :conversationId " +
             "AND m.createdAt > :since ORDER BY m.createdAt ASC")
@@ -94,7 +107,8 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     // Mensajes del sistema
     List<Message> findByIsSystemMessageTrue();
 
-    List<Message> findByConversationIdAndIsSystemMessageTrue(Long conversationId);
+    @Query("SELECT m FROM Message m WHERE m.conversation.id = :conversationId AND m.isSystemMessage = true")
+    List<Message> findByConversationIdAndIsSystemMessageTrue(@Param("conversationId") Long conversationId);
 
     // Estadísticas
     @Query("SELECT COUNT(m) FROM Message m WHERE m.sender.id = :userId " +
@@ -111,5 +125,8 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     void deleteMessagesOlderThan(@Param("cutoffDate") LocalDateTime cutoffDate);
 
     // Verificaciones
-    boolean existsByConversationIdAndSenderId(Long conversationId, Long senderId);
+    @Query("SELECT CASE WHEN COUNT(m) > 0 THEN true ELSE false END FROM Message m " +
+            "WHERE m.conversation.id = :conversationId AND m.sender.id = :senderId")
+    boolean existsByConversationIdAndSenderId(@Param("conversationId") Long conversationId,
+                                              @Param("senderId") Long senderId);
 }

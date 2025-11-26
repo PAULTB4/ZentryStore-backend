@@ -20,8 +20,6 @@ public interface PublicationRepository extends JpaRepository<Publication, Long> 
 
     List<Publication> findByUserIdAndStatus(Long userId, PublicationStatus status);
 
-    Long countByUserId(Long userId);
-
     // Búsquedas por categoría
     List<Publication> findByCategoryId(Long categoryId);
 
@@ -152,4 +150,15 @@ public interface PublicationRepository extends JpaRepository<Publication, Long> 
             "AND (:state IS NULL OR p.location.state = :state) " +
             "AND p.status = 'ACTIVE'")
     List<Publication> findByLocation(@Param("city") String city, @Param("state") String state);
+
+
+// Contar publicaciones por usuario
+    @Query("SELECT COUNT(p) FROM Publication p WHERE p.user.id = :userId")
+    Long countByUserId(@Param("userId") Long userId);
+
+    // Contar publicaciones activas por usuario
+    @Query("SELECT COUNT(p) FROM Publication p WHERE p.user.id = :userId AND p.status = :status")
+    Long countByUserIdAndStatus(@Param("userId") Long userId, @Param("status") String status);
+
+
 }

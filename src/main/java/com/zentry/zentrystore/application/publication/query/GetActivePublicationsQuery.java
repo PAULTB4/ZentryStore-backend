@@ -2,8 +2,15 @@ package com.zentry.zentrystore.application.publication.query;
 
 public class GetActivePublicationsQuery {
 
-    // Query sin parámetros - obtiene todas las publicaciones activas
+    private final int limit;
 
-    public GetActivePublicationsQuery() {
+    // Constructor
+    public GetActivePublicationsQuery(int limit) {
+        this.limit = limit;
+    }
+
+    // Getter
+    public int getLimit() {
+        return limit;
     }
 }

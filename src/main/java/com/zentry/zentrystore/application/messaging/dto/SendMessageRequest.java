@@ -6,6 +6,9 @@ import jakarta.validation.constraints.Size;
 
 public class SendMessageRequest {
 
+    @NotNull(message = "Sender ID is required")
+    private Long senderId;  // ← AGREGAR ESTO
+
     @NotNull(message = "Recipient ID is required")
     private Long recipientId;
 
@@ -21,6 +24,14 @@ public class SendMessageRequest {
     }
 
     // Getters and Setters
+    public Long getSenderId() {  // ← AGREGAR ESTO
+        return senderId;
+    }
+
+    public void setSenderId(Long senderId) {  // ← AGREGAR ESTO
+        this.senderId = senderId;
+    }
+
     public Long getRecipientId() {
         return recipientId;
     }
