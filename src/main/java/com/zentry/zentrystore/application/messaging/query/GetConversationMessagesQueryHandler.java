@@ -1,6 +1,8 @@
 package com.zentry.zentrystore.application.messaging.query;
 
 import com.zentry.zentrystore.application.messaging.dto.MessageDTO;
+import com.zentry.zentrystore.application.messaging.mapper.MessagingMapper;
+import com.zentry.zentrystore.application.messaging.query.GetConversationMessagesQuery;
 import com.zentry.zentrystore.domain.messaging.exception.ConversationNotFoundException;
 import com.zentry.zentrystore.domain.messaging.model.Conversation;
 import com.zentry.zentrystore.domain.messaging.model.Message;
@@ -17,11 +19,15 @@ public class GetConversationMessagesQueryHandler {
 
     private final MessageRepository messageRepository;
     private final ConversationRepository conversationRepository;
+    private final MessagingMapper messagingMapper;
 
-    public GetConversationMessagesQueryHandler(MessageRepository messageRepository,
-                                               ConversationRepository conversationRepository) {
+    public GetConversationMessagesQueryHandler(
+            MessageRepository messageRepository,
+            ConversationRepository conversationRepository,
+            MessagingMapper messagingMapper) {
         this.messageRepository = messageRepository;
         this.conversationRepository = conversationRepository;
+        this.messagingMapper = messagingMapper;
     }
 
     public List<MessageDTO> handle(GetConversationMessagesQuery query) {
@@ -38,7 +44,6 @@ public class GetConversationMessagesQueryHandler {
         List<Message> messages = messageRepository
                 .findByConversationIdOrderByCreatedAtAsc(query.getConversationId());
 
-        // TODO: Mapear a DTOs cuando tengamos mapper
-        return null;
+        return messagingMapper.toMessageDTOList(messages);
     }
 }

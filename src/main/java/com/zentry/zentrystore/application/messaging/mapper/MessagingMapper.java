@@ -46,19 +46,12 @@ public class MessagingMapper {
         dto.setUser2Id(conversation.getUser2().getId());
         dto.setUser2Username(conversation.getUser2().getUsername());
         dto.setLastMessageAt(conversation.getLastMessageAt());
-        // Por defecto usamos false, en la versión con userId lo calculamos correctamente
         dto.setIsArchived(false);
         dto.setIsBlocked(conversation.isBlockedByEitherUser());
         dto.setCreatedAt(conversation.getCreatedAt());
 
-        // Mapear último mensaje si existe
-        if (!conversation.getMessages().isEmpty()) {
-            Message lastMessage = conversation.getMessages().get(conversation.getMessages().size() - 1);
-            dto.setLastMessage(toMessageDTO(lastMessage));
-        }
-
-        // Calcular mensajes no leídos (esto dependerá del contexto del usuario)
-        // Por ahora lo dejamos en 0
+        // NO intentar acceder a la colección messages que es LAZY
+        dto.setLastMessage(null);
         dto.setUnreadCount(0);
 
         return dto;
@@ -73,10 +66,7 @@ public class MessagingMapper {
 
         // Calcular datos específicos del usuario actual
         if (currentUserId != null) {
-            // Mensajes no leídos usando el contador de la conversación
             dto.setUnreadCount(conversation.getUnreadCountForUser(currentUserId));
-
-            // Estado de archivado y bloqueado para este usuario
             dto.setIsArchived(conversation.isArchivedByUser(currentUserId));
             dto.setIsBlocked(conversation.isBlockedByUser(currentUserId));
         }

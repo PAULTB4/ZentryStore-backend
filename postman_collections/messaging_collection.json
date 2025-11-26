@@ -1,0 +1,232 @@
+{
+  "info": {
+    "_postman_id": "zentrystore-messaging-collection",
+    "name": "ZentryStore - Messaging",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Colección para probar endpoints de conversations (mensajería) de ZentryStore"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost" },
+    { "key": "port", "value": "8087" },
+    { "key": "currentUserId", "value": "10" },
+    { "key": "otherUserId", "value": "9" },
+    { "key": "publicationId", "value": "9" },
+    { "key": "conversationId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "01 - Create Conversation",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"currentUserId\": {{currentUserId}},\n  \"recipientId\": {{otherUserId}},\n  \"publicationId\": {{publicationId}},\n  \"initialMessage\": \"Hola, ¿aún disponible?\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}:{{port}}/api/conversations",
+          "host": [ "{{baseUrl}}" ],
+          "path": [ "api", "conversations" ],
+          "port": "{{port}}"
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 201', function () { pm.response.to.have.status(201); });",
+              "var json = pm.response.json();",
+              "pm.test('Response has id', function () { pm.expect(json).to.have.property('id'); });",
+              "if (json && json.id) { pm.collectionVariables.set('conversationId', json.id); pm.environment.set('conversationId', json.id); }"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 - Get Conversation by ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}:{{port}}/api/conversations/{{conversationId}}?currentUserId={{currentUserId}}",
+          "host": [ "{{baseUrl}}" ],
+          "path": [ "api", "conversations", "{{conversationId}}" ],
+          "port": "{{port}}",
+          "query": [ { "key": "currentUserId", "value": "{{currentUserId}}" } ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Has id and user fields', function () { var json = pm.response.json(); pm.expect(json).to.include.keys('id','user1Id','user2Id','createdAt'); });",
+              "pm.test('user1Id equals currentUserId (number)', function () { var json = pm.response.json(); pm.expect(json.user1Id).to.eql(parseInt(pm.environment.get('currentUserId'))); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 - List User Conversations (paged)",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}:{{port}}/api/conversations?page=0&size=20&currentUserId={{currentUserId}}",
+          "host": [ "{{baseUrl}}" ],
+          "path": [ "api", "conversations" ],
+          "port": "{{port}}",
+          "query": [
+            { "key": "page", "value": "0" },
+            { "key": "size", "value": "20" },
+            { "key": "currentUserId", "value": "{{currentUserId}}" }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Response is array', function () { var json = pm.response.json(); pm.expect(Array.isArray(json)).to.be.true; });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 - Get Conversation Between Users",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}:{{port}}/api/conversations/between?otherUserId={{otherUserId}}&currentUserId={{currentUserId}}",
+          "host": [ "{{baseUrl}}" ],
+          "path": [ "api", "conversations", "between" ],
+          "port": "{{port}}",
+          "query": [ { "key": "otherUserId", "value": "{{otherUserId}}" }, { "key": "currentUserId", "value": "{{currentUserId}}" } ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200 or 404 if no conversation', function () { pm.expect(pm.response.code===200 || pm.response.code===404).to.be.true; });",
+              "if (pm.response.code===200) { pm.test('Has id', function () { var json=pm.response.json(); pm.expect(json).to.have.property('id'); }); }"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 - Get Conversation Messages",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}:{{port}}/api/conversations/{{conversationId}}/messages?page=0&size=50&currentUserId={{currentUserId}}",
+          "host": [ "{{baseUrl}}" ],
+          "path": [ "api", "conversations", "{{conversationId}}", "messages" ],
+          "port": "{{port}}",
+          "query": [ { "key": "page", "value": "0" }, { "key": "size", "value": "50" }, { "key": "currentUserId", "value": "{{currentUserId}}" } ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Response is array', function () { var json = pm.response.json(); pm.expect(Array.isArray(json)).to.be.true; });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 - Archive Conversation (PATCH)",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}:{{port}}/api/conversations/{{conversationId}}/archive?archive=true&currentUserId={{currentUserId}}",
+          "host": [ "{{baseUrl}}" ],
+          "path": [ "api", "conversations", "{{conversationId}}", "archive" ],
+          "port": "{{port}}",
+          "query": [ { "key": "archive", "value": "true" }, { "key": "currentUserId", "value": "{{currentUserId}}" } ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 204', function () { pm.response.to.have.status(204); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 - Unarchive Conversation (PATCH)",
+      "request": {
+        "method": "PATCH",
+        "url": {
+          "raw": "{{baseUrl}}:{{port}}/api/conversations/{{conversationId}}/archive?archive=false&currentUserId={{currentUserId}}",
+          "host": [ "{{baseUrl}}" ],
+          "path": [ "api", "conversations", "{{conversationId}}", "archive" ],
+          "port": "{{port}}",
+          "query": [ { "key": "archive", "value": "false" }, { "key": "currentUserId", "value": "{{currentUserId}}" } ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 204', function () { pm.response.to.have.status(204); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 - Delete Conversation (DELETE)",
+      "request": {
+        "method": "DELETE",
+        "url": {
+          "raw": "{{baseUrl}}:{{port}}/api/conversations/{{conversationId}}?currentUserId={{currentUserId}}",
+          "host": [ "{{baseUrl}}" ],
+          "path": [ "api", "conversations", "{{conversationId}}" ],
+          "port": "{{port}}",
+          "query": [ { "key": "currentUserId", "value": "{{currentUserId}}" } ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 204', function () { pm.response.to.have.status(204); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    }
+  ]
+}
+

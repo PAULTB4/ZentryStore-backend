@@ -1,5 +1,7 @@
 package com.zentry.zentrystore.api.controller.auth;
 
+import com.zentry.zentrystore.application.auth.command.LoginCommand;
+import com.zentry.zentrystore.application.auth.command.LoginCommandHandler;
 import com.zentry.zentrystore.application.user.command.RegisterUserCommand;
 import com.zentry.zentrystore.application.user.command.RegisterUserCommandHandler;
 import com.zentry.zentrystore.application.user.dto.request.LoginRequest;
@@ -16,9 +18,12 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final RegisterUserCommandHandler registerUserCommandHandler;
+    private final LoginCommandHandler loginCommandHandler;
 
-    public AuthController(RegisterUserCommandHandler registerUserCommandHandler) {
+    public AuthController(RegisterUserCommandHandler registerUserCommandHandler,
+                          LoginCommandHandler loginCommandHandler) {
         this.registerUserCommandHandler = registerUserCommandHandler;
+        this.loginCommandHandler = loginCommandHandler;
     }
 
     @PostMapping("/register")
@@ -35,12 +40,18 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
-        // TODO: Implementar con JWT
-        return ResponseEntity.ok().build();
+        LoginCommand command = new LoginCommand(
+                request.getEmail(),
+                request.getPassword()
+        );
+
+        AuthResponse response = loginCommandHandler.handle(command);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout() {
+        // TODO: Invalidar JWT token
         return ResponseEntity.noContent().build();
     }
 }
