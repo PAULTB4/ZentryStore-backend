@@ -1,6 +1,7 @@
 package com.zentry.zentrystore.application.messaging.command;
 
 import com.zentry.zentrystore.application.messaging.dto.MessageDTO;
+import com.zentry.zentrystore.application.messaging.mapper.MessagingMapper;
 import com.zentry.zentrystore.domain.messaging.model.Conversation;
 import com.zentry.zentrystore.domain.messaging.model.Message;
 import com.zentry.zentrystore.domain.messaging.repository.ConversationRepository;
@@ -17,13 +18,16 @@ public class SendMessageCommandHandler {
     private final MessageRepository messageRepository;
     private final ConversationRepository conversationRepository;
     private final UserRepository userRepository;
+    private final MessagingMapper messagingMapper;
 
     public SendMessageCommandHandler(MessageRepository messageRepository,
                                      ConversationRepository conversationRepository,
-                                     UserRepository userRepository) {
+                                     UserRepository userRepository,
+                                     MessagingMapper messagingMapper) {
         this.messageRepository = messageRepository;
         this.conversationRepository = conversationRepository;
         this.userRepository = userRepository;
+        this.messagingMapper = messagingMapper;
     }
 
     @Transactional
@@ -65,7 +69,7 @@ public class SendMessageCommandHandler {
         // TODO: Publicar evento MessageSentEvent
         // TODO: Enviar notificación al destinatario
 
-        // Retornar DTO
-        return null; // TODO: Mapear cuando tengamos mapper
+        // Retornar DTO mapeado
+        return messagingMapper.toMessageDTO(savedMessage);
     }
 }

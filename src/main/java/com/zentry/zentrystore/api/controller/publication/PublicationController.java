@@ -1,39 +1,36 @@
 package com.zentry.zentrystore.api.controller.publication;
 
-
-import com.zentry.zentrystore.application.publication.command.CreatePublicationCommand;
-import com.zentry.zentrystore.application.publication.command.UpdatePublicationCommand;
-import com.zentry.zentrystore.application.publication.command.DeletePublicationCommand;
-import com.zentry.zentrystore.application.publication.command.ChangePublicationStatusCommand;
-import com.zentry.zentrystore.application.publication.command.CreatePublicationCommandHandler;
-import com.zentry.zentrystore.application.publication.command.UpdatePublicationCommandHandler;
-import com.zentry.zentrystore.application.publication.command.DeletePublicationCommandHandler;
-import com.zentry.zentrystore.application.publication.command.ChangePublicationStatusCommandHandler;
-import com.zentry.zentrystore.application.publication.dto.CreatePublicationRequest;
-import com.zentry.zentrystore.application.publication.dto.PublicationDTO;
-import com.zentry.zentrystore.application.publication.dto.UpdatePublicationRequest;
-import com.zentry.zentrystore.application.publication.dto.PublicationResponse;
-import com.zentry.zentrystore.application.publication.query.GetPublicationByIdQuery;
-import com.zentry.zentrystore.application.publication.query.GetRecentPublicationsQuery;
-import com.zentry.zentrystore.application.publication.query.GetPublicationByIdQueryHandler;
-import com.zentry.zentrystore.application.publication.query.GetRecentPublicationsQueryHandler;
+import com.zentry.zentrystore.application.publication.command.*;
+import com.zentry.zentrystore.application.publication.dto.*;
+import com.zentry.zentrystore.application.publication.query.*;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/publications")
 public class PublicationController {
 
+    // Command Handlers
     private final CreatePublicationCommandHandler createPublicationCommandHandler;
     private final UpdatePublicationCommandHandler updatePublicationCommandHandler;
     private final DeletePublicationCommandHandler deletePublicationCommandHandler;
     private final ChangePublicationStatusCommandHandler changePublicationStatusCommandHandler;
+
+    // Query Handlers
     private final GetPublicationByIdQueryHandler getPublicationByIdQueryHandler;
     private final GetRecentPublicationsQueryHandler getRecentPublicationsQueryHandler;
+    private final GetActivePublicationsQueryHandler getActivePublicationsQueryHandler;
+    private final GetFeaturedPublicationsQueryHandler getFeaturedPublicationsQueryHandler;
+    private final GetPublicationsByCategoryQueryHandler getPublicationsByCategoryQueryHandler;
+    private final GetPublicationsByUserQueryHandler getPublicationsByUserQueryHandler;
+    private final GetPublicationsByLocationQueryHandler getPublicationsByLocationQueryHandler;
+    private final SearchPublicationsQueryHandler searchPublicationsQueryHandler;
+    private final GetAllCategoriesQueryHandler getAllCategoriesQueryHandler;
 
     public PublicationController(
             CreatePublicationCommandHandler createPublicationCommandHandler,
@@ -41,14 +38,32 @@ public class PublicationController {
             DeletePublicationCommandHandler deletePublicationCommandHandler,
             ChangePublicationStatusCommandHandler changePublicationStatusCommandHandler,
             GetPublicationByIdQueryHandler getPublicationByIdQueryHandler,
-            GetRecentPublicationsQueryHandler getRecentPublicationsQueryHandler) {
+            GetRecentPublicationsQueryHandler getRecentPublicationsQueryHandler,
+            GetActivePublicationsQueryHandler getActivePublicationsQueryHandler,
+            GetFeaturedPublicationsQueryHandler getFeaturedPublicationsQueryHandler,
+            GetPublicationsByCategoryQueryHandler getPublicationsByCategoryQueryHandler,
+            GetPublicationsByUserQueryHandler getPublicationsByUserQueryHandler,
+            GetPublicationsByLocationQueryHandler getPublicationsByLocationQueryHandler,
+            SearchPublicationsQueryHandler searchPublicationsQueryHandler,
+            GetAllCategoriesQueryHandler getAllCategoriesQueryHandler) {
         this.createPublicationCommandHandler = createPublicationCommandHandler;
         this.updatePublicationCommandHandler = updatePublicationCommandHandler;
         this.deletePublicationCommandHandler = deletePublicationCommandHandler;
         this.changePublicationStatusCommandHandler = changePublicationStatusCommandHandler;
         this.getPublicationByIdQueryHandler = getPublicationByIdQueryHandler;
         this.getRecentPublicationsQueryHandler = getRecentPublicationsQueryHandler;
+        this.getActivePublicationsQueryHandler = getActivePublicationsQueryHandler;
+        this.getFeaturedPublicationsQueryHandler = getFeaturedPublicationsQueryHandler;
+        this.getPublicationsByCategoryQueryHandler = getPublicationsByCategoryQueryHandler;
+        this.getPublicationsByUserQueryHandler = getPublicationsByUserQueryHandler;
+        this.getPublicationsByLocationQueryHandler = getPublicationsByLocationQueryHandler;
+        this.searchPublicationsQueryHandler = searchPublicationsQueryHandler;
+        this.getAllCategoriesQueryHandler = getAllCategoriesQueryHandler;
     }
+
+    // =============================================
+    // COMMANDS (POST, PUT, PATCH, DELETE)
+    // =============================================
 
     @PostMapping
     public ResponseEntity<PublicationResponse> createPublication(
@@ -76,21 +91,6 @@ public class PublicationController {
 
         PublicationResponse response = createPublicationCommandHandler.handle(command);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<PublicationDTO> getPublicationById(@PathVariable Long id) {
-        GetPublicationByIdQuery query = new GetPublicationByIdQuery(id);
-        PublicationDTO response = getPublicationByIdQueryHandler.handle(query);
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/recent")
-    public ResponseEntity<List<PublicationResponse>> getRecentPublications(
-            @RequestParam(defaultValue = "10") int limit) {
-        GetRecentPublicationsQuery query = new GetRecentPublicationsQuery(limit);
-        List<PublicationResponse> response = getRecentPublicationsQueryHandler.handle(query);
-        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{id}")
@@ -137,5 +137,93 @@ public class PublicationController {
         DeletePublicationCommand command = new DeletePublicationCommand(id);
         deletePublicationCommandHandler.handle(command);
         return ResponseEntity.noContent().build();
+    }
+
+    // =============================================
+    // QUERIES (GET)
+    // =============================================
+
+    @GetMapping("/{id}")
+    public ResponseEntity<PublicationDTO> getPublicationById(@PathVariable Long id) {
+        GetPublicationByIdQuery query = new GetPublicationByIdQuery(id);
+        PublicationDTO response = getPublicationByIdQueryHandler.handle(query);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/recent")
+    public ResponseEntity<List<PublicationResponse>> getRecentPublications(
+            @RequestParam(defaultValue = "10") int limit) {
+        GetRecentPublicationsQuery query = new GetRecentPublicationsQuery(limit);
+        List<PublicationResponse> response = getRecentPublicationsQueryHandler.handle(query);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/active")
+    public ResponseEntity<List<PublicationDTO>> getActivePublications(
+            @RequestParam(defaultValue = "20") int limit) {
+        GetActivePublicationsQuery query = new GetActivePublicationsQuery(limit);
+        List<PublicationDTO> response = getActivePublicationsQueryHandler.handle(query);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/featured")
+    public ResponseEntity<List<PublicationDTO>> getFeaturedPublications(
+            @RequestParam(defaultValue = "10") int limit) {
+        GetFeaturedPublicationsQuery query = new GetFeaturedPublicationsQuery(limit);
+        List<PublicationDTO> response = getFeaturedPublicationsQueryHandler.handle(query);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/category/{categoryId}")
+    public ResponseEntity<List<PublicationDTO>> getPublicationsByCategory(
+            @PathVariable Long categoryId,
+            @RequestParam(defaultValue = "20") int limit) {
+        GetPublicationsByCategoryQuery query = new GetPublicationsByCategoryQuery(categoryId, limit);
+        List<PublicationDTO> response = getPublicationsByCategoryQueryHandler.handle(query);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<PublicationDTO>> getPublicationsByUser(
+            @PathVariable Long userId) {
+        GetPublicationsByUserQuery query = new GetPublicationsByUserQuery(userId);
+        List<PublicationDTO> response = getPublicationsByUserQueryHandler.handle(query);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/location")
+    public ResponseEntity<List<PublicationResponse>> getPublicationsByLocation(
+            @RequestParam String city,
+            @RequestParam(required = false) String state) {
+        GetPublicationsByLocationQuery query = new GetPublicationsByLocationQuery(city, state);
+        List<PublicationResponse> response = getPublicationsByLocationQueryHandler.handle(query);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<PublicationDTO>> searchPublications(
+            @RequestParam String keyword,
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal maxPrice,
+            @RequestParam(required = false) String city,
+            @RequestParam(required = false) String condition) {
+        SearchPublicationsQuery query = new SearchPublicationsQuery(
+                keyword,
+                categoryId,
+                minPrice,
+                maxPrice,
+                city,
+                condition
+        );
+        List<PublicationDTO> response = searchPublicationsQueryHandler.handle(query);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/categories")
+    public ResponseEntity<List<CategoryDTO>> getAllCategories() {
+        GetAllCategoriesQuery query = new GetAllCategoriesQuery();
+        List<CategoryDTO> response = getAllCategoriesQueryHandler.handle(query);
+        return ResponseEntity.ok(response);
     }
 }

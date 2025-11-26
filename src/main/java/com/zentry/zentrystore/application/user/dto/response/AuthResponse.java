@@ -1,35 +1,55 @@
 package com.zentry.zentrystore.application.user.dto.response;
 
+import java.util.List;
+
 public class AuthResponse {
 
-    private String accessToken;
-    private String refreshToken;
-    private String tokenType = "Bearer";
-    private Long expiresIn;
-    private UserResponse user;
+    private Long userId;
+    private String username;      // ← Agrega este
+    private String email;         // ← Agrega este
+    private String token;
+    private List<String> roles;
 
     public AuthResponse() {}
 
-    public AuthResponse(String accessToken, String refreshToken, Long expiresIn, UserResponse user) {
-        this.accessToken = accessToken;
-        this.refreshToken = refreshToken;
-        this.expiresIn = expiresIn;
-        this.user = user;
+    // Getters y Setters
+    public Long getUserId() {
+        return userId;
     }
 
-    // Getters and Setters
-    public String getAccessToken() { return accessToken; }
-    public void setAccessToken(String accessToken) { this.accessToken = accessToken; }
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
 
-    public String getRefreshToken() { return refreshToken; }
-    public void setRefreshToken(String refreshToken) { this.refreshToken = refreshToken; }
+    public String getUsername() {
+        return username;
+    }
 
-    public String getTokenType() { return tokenType; }
-    public void setTokenType(String tokenType) { this.tokenType = tokenType; }
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
-    public Long getExpiresIn() { return expiresIn; }
-    public void setExpiresIn(Long expiresIn) { this.expiresIn = expiresIn; }
+    public String getEmail() {
+        return email;
+    }
 
-    public UserResponse getUser() { return user; }
-    public void setUser(UserResponse user) { this.user = user; }
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public List<String> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<String> roles) {
+        this.roles = roles;
+    }
 }

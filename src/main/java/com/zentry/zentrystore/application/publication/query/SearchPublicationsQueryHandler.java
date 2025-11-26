@@ -1,22 +1,26 @@
 package com.zentry.zentrystore.application.publication.query;
 
 import com.zentry.zentrystore.application.publication.dto.PublicationDTO;
+import com.zentry.zentrystore.application.publication.mapper.PublicationMapper;
 import com.zentry.zentrystore.domain.publication.model.Publication;
 import com.zentry.zentrystore.domain.publication.repository.PublicationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
 public class SearchPublicationsQueryHandler {
 
     private final PublicationRepository publicationRepository;
+    private final PublicationMapper publicationMapper;
 
-    public SearchPublicationsQueryHandler(PublicationRepository publicationRepository) {
+    public SearchPublicationsQueryHandler(PublicationRepository publicationRepository,
+                                          PublicationMapper publicationMapper) {
         this.publicationRepository = publicationRepository;
+        this.publicationMapper = publicationMapper;
     }
 
     public List<PublicationDTO> handle(SearchPublicationsQuery query) {
@@ -53,7 +57,8 @@ public class SearchPublicationsQueryHandler {
             publications = publicationRepository.findActivePublications();
         }
 
-        // TODO: Mapear a DTOs cuando tengamos mapper
-        return null;
+        return publications.stream()
+                .map(publicationMapper::toDTO)
+                .collect(Collectors.toList());
     }
 }

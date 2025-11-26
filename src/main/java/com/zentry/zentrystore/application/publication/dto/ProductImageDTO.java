@@ -8,6 +8,9 @@ public class ProductImageDTO {
     private Boolean isPrimary;
     private Integer displayOrder;
     private String altText;
+    private Long fileSize;      // ← Agregar este
+    private String format;      // ← Agregar este
+
 
     // Constructors
     public ProductImageDTO() {
@@ -61,4 +64,12 @@ public class ProductImageDTO {
     public void setAltText(String altText) {
         this.altText = altText;
     }
+
+
+    // ← Agregar estos getters y setters
+    public Long getFileSize() { return fileSize; }
+    public void setFileSize(Long fileSize) { this.fileSize = fileSize; }
+
+    public String getFormat() { return format; }
+    public void setFormat(String format) { this.format = format; }
 }
