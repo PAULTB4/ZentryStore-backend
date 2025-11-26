@@ -1,6 +1,7 @@
 package com.zentry.zentrystore.application.favorite.command;
 
 import com.zentry.zentrystore.application.favorite.dto.FavoriteDTO;
+import com.zentry.zentrystore.application.favorite.mapper.FavoriteMapper;
 import com.zentry.zentrystore.domain.favorite.model.Favorite;
 import com.zentry.zentrystore.domain.favorite.repository.FavoriteRepository;
 import com.zentry.zentrystore.domain.publication.exception.PublicationNotFoundException;
@@ -18,13 +19,17 @@ public class AddFavoriteCommandHandler {
     private final FavoriteRepository favoriteRepository;
     private final UserRepository userRepository;
     private final PublicationRepository publicationRepository;
+    private final FavoriteMapper favoriteMapper;
 
-    public AddFavoriteCommandHandler(FavoriteRepository favoriteRepository,
-                                     UserRepository userRepository,
-                                     PublicationRepository publicationRepository) {
+    public AddFavoriteCommandHandler(
+            FavoriteRepository favoriteRepository,
+            UserRepository userRepository,
+            PublicationRepository publicationRepository,
+            FavoriteMapper favoriteMapper) {
         this.favoriteRepository = favoriteRepository;
         this.userRepository = userRepository;
         this.publicationRepository = publicationRepository;
+        this.favoriteMapper = favoriteMapper;
     }
 
     @Transactional
@@ -54,7 +59,7 @@ public class AddFavoriteCommandHandler {
 
         // TODO: Publicar evento FavoriteAddedEvent
 
-        // Retornar DTO
-        return null; // TODO: Mapear cuando tengamos mapper
+        // Retornar DTO mapeado
+        return favoriteMapper.toDTO(savedFavorite);
     }
 }
