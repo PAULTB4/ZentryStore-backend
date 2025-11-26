@@ -64,6 +64,12 @@ public class Conversation {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "publication_id")
+    private Long publicationId;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
     // Constructors
     public Conversation() {
     }
@@ -277,4 +283,38 @@ public class Conversation {
         this.updatedAt = updatedAt;
     }
 
+    // Métodos helper para obtener IDs desde las relaciones
+    public Long getUser1Id() {
+        return this.user1 != null ? this.user1.getId() : null;
+    }
+
+    public void setUser1Id(Long user1Id) {
+        // Este setter no se usa directamente
+        // La asignación se hace mediante setUser1(User)
+    }
+
+    public Long getUser2Id() {
+        return this.user2 != null ? this.user2.getId() : null;
+    }
+
+    public void setUser2Id(Long user2Id) {
+        // Este setter no se usa directamente
+        // La asignación se hace mediante setUser2(User)
+    }
+
+    public Long getPublicationId() {
+        return publicationId;
+    }
+
+    public void setPublicationId(Long publicationId) {
+        this.publicationId = publicationId;
+    }
+
+    public LocalDateTime getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
+    }
 }

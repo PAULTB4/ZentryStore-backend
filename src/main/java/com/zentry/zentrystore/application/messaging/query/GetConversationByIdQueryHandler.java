@@ -1,6 +1,8 @@
 package com.zentry.zentrystore.application.messaging.query;
 
 import com.zentry.zentrystore.application.messaging.dto.ConversationDTO;
+import com.zentry.zentrystore.application.messaging.mapper.MessagingMapper;
+import com.zentry.zentrystore.application.messaging.query.GetConversationByIdQuery;
 import com.zentry.zentrystore.domain.messaging.exception.ConversationNotFoundException;
 import com.zentry.zentrystore.domain.messaging.model.Conversation;
 import com.zentry.zentrystore.domain.messaging.repository.ConversationRepository;
@@ -12,9 +14,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class GetConversationByIdQueryHandler {
 
     private final ConversationRepository conversationRepository;
+    private final MessagingMapper messagingMapper;
 
-    public GetConversationByIdQueryHandler(ConversationRepository conversationRepository) {
+    public GetConversationByIdQueryHandler(
+            ConversationRepository conversationRepository,
+            MessagingMapper messagingMapper) {
         this.conversationRepository = conversationRepository;
+        this.messagingMapper = messagingMapper;
     }
 
     public ConversationDTO handle(GetConversationByIdQuery query) {
@@ -27,7 +33,6 @@ public class GetConversationByIdQueryHandler {
             throw new IllegalArgumentException("User is not part of this conversation");
         }
 
-        // TODO: Mapear a DTO cuando tengamos mapper
-        return null;
+        return messagingMapper.toConversationDTO(conversation, query.getUserId());
     }
 }

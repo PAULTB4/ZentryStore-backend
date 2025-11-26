@@ -1,13 +1,10 @@
-package com.zentry.zentrystore.application.messaging.query;
+package com.zentry.zentrystore.application.messaging.command;
 
-import org.springframework.data.domain.Pageable;
-
-public class GetConversationMessagesQuery {
-
+public class DeleteConversationCommand {
     private final Long conversationId;
     private final Long userId;
 
-    public GetConversationMessagesQuery(Long conversationId, Long userId, Pageable pageable) {
+    public DeleteConversationCommand(Long conversationId, Long userId) {
         this.conversationId = conversationId;
         this.userId = userId;
     }
