@@ -1,6 +1,7 @@
 package com.zentry.zentrystore.application.report.commad;
 
 import com.zentry.zentrystore.application.report.dto.ReportDTO;
+import com.zentry.zentrystore.application.report.mapper.ReportMapper;
 import com.zentry.zentrystore.domain.report.model.Report;
 import com.zentry.zentrystore.domain.report.model.ReportStatus;
 import com.zentry.zentrystore.domain.report.repository.ReportRepository;
@@ -11,9 +12,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class UpdateReportStatusCommandHandler {
 
     private final ReportRepository reportRepository;
+    private final ReportMapper reportMapper;
 
-    public UpdateReportStatusCommandHandler(ReportRepository reportRepository) {
+    public UpdateReportStatusCommandHandler(
+            ReportRepository reportRepository,
+            ReportMapper reportMapper) {
         this.reportRepository = reportRepository;
+        this.reportMapper = reportMapper;
     }
 
     @Transactional
@@ -53,7 +58,6 @@ public class UpdateReportStatusCommandHandler {
         // TODO: Publicar evento ReportStatusChangedEvent
         // TODO: Notificar al reportador del cambio de estado
 
-        // Retornar DTO
-        return null; // TODO: Mapear cuando tengamos mapper
+        return reportMapper.toDTO(savedReport);
     }
 }

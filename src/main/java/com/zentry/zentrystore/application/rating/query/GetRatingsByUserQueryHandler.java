@@ -1,6 +1,7 @@
 package com.zentry.zentrystore.application.rating.query;
 
 import com.zentry.zentrystore.application.rating.dto.RatingDTO;
+import com.zentry.zentrystore.application.rating.mapper.RatingMapper;
 import com.zentry.zentrystore.domain.rating.model.Rating;
 import com.zentry.zentrystore.domain.rating.repository.RatingRepository;
 import org.springframework.stereotype.Service;
@@ -13,8 +14,10 @@ import java.util.List;
 public class GetRatingsByUserQueryHandler {
 
     private final RatingRepository ratingRepository;
+    private final RatingMapper ratingMapper; // ⬅️ 2. Declarar el campo
 
-    public GetRatingsByUserQueryHandler(RatingRepository ratingRepository) {
+    public GetRatingsByUserQueryHandler(RatingRepository ratingRepository, RatingMapper ratingMapper) {
+        this.ratingMapper = ratingMapper; // ⬅️ 3. Inicializar el
         this.ratingRepository = ratingRepository;
     }
 
@@ -22,7 +25,6 @@ public class GetRatingsByUserQueryHandler {
         List<Rating> ratings = ratingRepository
                 .findVisibleRatingsByRatedUser(query.getUserId());
 
-        // TODO: Mapear a DTOs cuando tengamos mapper
-        return null;
+        return ratingMapper.toDTOList(ratings);  // ✅ AGREGAR ESTA LÍNEA
     }
 }

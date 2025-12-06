@@ -1,6 +1,7 @@
 package com.zentry.zentrystore.application.rating.command;
 
 import com.zentry.zentrystore.application.rating.dto.RatingDTO;
+import com.zentry.zentrystore.application.rating.mapper.RatingMapper;
 import com.zentry.zentrystore.domain.rating.model.Rating;
 import com.zentry.zentrystore.domain.rating.model.RatingScore;
 import com.zentry.zentrystore.domain.rating.repository.RatingRepository;
@@ -11,9 +12,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class UpdateRatingCommandHandler {
 
     private final RatingRepository ratingRepository;
+    private final RatingMapper ratingMapper; // ⬅️ DECLARAR
 
-    public UpdateRatingCommandHandler(RatingRepository ratingRepository) {
+    public UpdateRatingCommandHandler(RatingRepository ratingRepository, RatingMapper ratingMapper) {
         this.ratingRepository = ratingRepository;
+        this.ratingMapper = ratingMapper;
     }
 
     @Transactional
@@ -55,7 +58,7 @@ public class UpdateRatingCommandHandler {
         // Guardar cambios
         Rating savedRating = ratingRepository.save(rating);
 
-        // Retornar DTO
-        return null; // TODO: Mapear cuando tengamos mapper
+        // Mapear y retornar DTO
+        return ratingMapper.toDTO(savedRating);  // ✅ AGREGAR ESTA LÍNEA
     }
 }
