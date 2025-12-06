@@ -1,6 +1,7 @@
 package com.zentry.zentrystore.application.report.query;
 
 import com.zentry.zentrystore.application.report.dto.ReportDTO;
+import com.zentry.zentrystore.application.report.mapper.ReportMapper;
 import com.zentry.zentrystore.domain.report.model.Report;
 import com.zentry.zentrystore.domain.report.model.ReportType;
 import com.zentry.zentrystore.domain.report.repository.ReportRepository;
@@ -14,9 +15,13 @@ import java.util.List;
 public class GetReportsByTypeQueryHandler {
 
     private final ReportRepository reportRepository;
+    private final ReportMapper reportMapper;
 
-    public GetReportsByTypeQueryHandler(ReportRepository reportRepository) {
+    public GetReportsByTypeQueryHandler(
+            ReportRepository reportRepository,
+            ReportMapper reportMapper) {
         this.reportRepository = reportRepository;
+        this.reportMapper = reportMapper;
     }
 
     public List<ReportDTO> handle(GetReportsByTypeQuery query) {
@@ -28,8 +33,6 @@ public class GetReportsByTypeQueryHandler {
         }
 
         List<Report> reports = reportRepository.findByType(type);
-
-        // TODO: Mapear a DTOs cuando tengamos mapper
-        return null;
+        return reportMapper.toDTOList(reports);
     }
 }

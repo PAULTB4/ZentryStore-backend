@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface PublicationRepository extends JpaRepository<Publication, Long> {
+public interface PublicationRepository extends JpaRepository<Publication, Long>, PublicationRepositoryCustom  {
 
     // Búsquedas por usuario
     List<Publication> findByUserId(Long userId);

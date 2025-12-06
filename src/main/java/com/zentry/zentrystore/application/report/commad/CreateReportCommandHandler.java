@@ -1,6 +1,7 @@
 package com.zentry.zentrystore.application.report.commad;
 
 import com.zentry.zentrystore.application.report.dto.ReportDTO;
+import com.zentry.zentrystore.application.report.mapper.ReportMapper;
 import com.zentry.zentrystore.domain.report.exception.DuplicateReportException;
 import com.zentry.zentrystore.domain.report.model.Report;
 import com.zentry.zentrystore.domain.report.model.ReportType;
@@ -16,11 +17,15 @@ public class CreateReportCommandHandler {
 
     private final ReportRepository reportRepository;
     private final UserRepository userRepository;
+    private final ReportMapper reportMapper;
 
-    public CreateReportCommandHandler(ReportRepository reportRepository,
-                                      UserRepository userRepository) {
+    public CreateReportCommandHandler(
+            ReportRepository reportRepository,
+            UserRepository userRepository,
+            ReportMapper reportMapper) {
         this.reportRepository = reportRepository;
         this.userRepository = userRepository;
+        this.reportMapper = reportMapper;
     }
 
     @Transactional
@@ -37,7 +42,7 @@ public class CreateReportCommandHandler {
             throw new IllegalArgumentException("Invalid report type: " + command.getReportType());
         }
 
-        // Verificar que no exista un reporte duplicado (mismo reportador, entidad y tipo)
+        // Verificar que no exista un reporte duplicado
         if (reportRepository.existsByReporterIdAndReportedEntityIdAndType(
                 command.getReporterId(),
                 command.getReportedEntityId(),
@@ -64,7 +69,6 @@ public class CreateReportCommandHandler {
         // TODO: Publicar evento ReportCreatedEvent
         // TODO: Notificar a moderadores
 
-        // Retornar DTO
-        return null; // TODO: Mapear cuando tengamos mapper
+        return reportMapper.toDTO(savedReport);
     }
 }

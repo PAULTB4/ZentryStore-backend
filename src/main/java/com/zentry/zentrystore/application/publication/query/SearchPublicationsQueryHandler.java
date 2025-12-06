@@ -1,6 +1,6 @@
 package com.zentry.zentrystore.application.publication.query;
 
-import com.zentry.zentrystore.application.publication.dto.PublicationDTO;
+import com.zentry.zentrystore.application.publication.dto.PublicationSummaryDTO;
 import com.zentry.zentrystore.application.publication.mapper.PublicationMapper;
 import com.zentry.zentrystore.domain.publication.model.Publication;
 import com.zentry.zentrystore.domain.publication.repository.PublicationRepository;
@@ -23,42 +23,22 @@ public class SearchPublicationsQueryHandler {
         this.publicationMapper = publicationMapper;
     }
 
-    public List<PublicationDTO> handle(SearchPublicationsQuery query) {
-        List<Publication> publications;
+    public List<PublicationSummaryDTO> handle(SearchPublicationsQuery query) {
 
-        // Búsqueda compleja con filtros
-        if (query.getCategoryId() != null && query.getMinPrice() != null
-                && query.getMaxPrice() != null && query.getCity() != null) {
-
-            publications = publicationRepository.findByCategoryPriceRangeAndCity(
-                    query.getCategoryId(),
-                    query.getMinPrice(),
-                    query.getMaxPrice(),
-                    query.getCity()
-            );
-        }
-        // Búsqueda por rango de precio
-        else if (query.getMinPrice() != null && query.getMaxPrice() != null) {
-            publications = publicationRepository.findByPriceRange(
-                    query.getMinPrice(),
-                    query.getMaxPrice()
-            );
-        }
-        // Búsqueda por texto
-        else if (query.getSearchTerm() != null && !query.getSearchTerm().isEmpty()) {
-            publications = publicationRepository.searchByTitleOrDescription(query.getSearchTerm());
-        }
-        // Búsqueda por condición
-        else if (query.getCondition() != null) {
-            publications = publicationRepository.findByCondition(query.getCondition());
-        }
-        // Publicaciones activas por defecto
-        else {
-            publications = publicationRepository.findActivePublications();
-        }
+        List<Publication> publications = publicationRepository.searchAdvanced(
+                query.getSearchTerm(),
+                query.getCategoryId(),
+                query.getMinPrice(),
+                query.getMaxPrice(),
+                query.getCity(),
+                query.getCondition(),
+                query.getFreeShipping(),
+                query.getSortBy(),
+                query.getOrder()
+        );
 
         return publications.stream()
-                .map(publicationMapper::toDTO)
+                .map(publicationMapper::toSummaryDto)  // <-- NUEVO DTO
                 .collect(Collectors.toList());
     }
 }

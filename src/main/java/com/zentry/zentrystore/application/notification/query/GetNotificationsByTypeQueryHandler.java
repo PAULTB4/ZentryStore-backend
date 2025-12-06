@@ -1,6 +1,7 @@
 package com.zentry.zentrystore.application.notification.query;
 
 import com.zentry.zentrystore.application.notification.dto.NotificationDTO;
+import com.zentry.zentrystore.application.notification.mapper.NotificationMapper;
 import com.zentry.zentrystore.domain.notification.model.Notification;
 import com.zentry.zentrystore.domain.notification.model.NotificationType;
 import com.zentry.zentrystore.domain.notification.repository.NotificationRepository;
@@ -14,9 +15,13 @@ import java.util.List;
 public class GetNotificationsByTypeQueryHandler {
 
     private final NotificationRepository notificationRepository;
+    private final NotificationMapper notificationMapper;
 
-    public GetNotificationsByTypeQueryHandler(NotificationRepository notificationRepository) {
+    public GetNotificationsByTypeQueryHandler(
+            NotificationRepository notificationRepository,
+            NotificationMapper notificationMapper) {
         this.notificationRepository = notificationRepository;
+        this.notificationMapper = notificationMapper;
     }
 
     public List<NotificationDTO> handle(GetNotificationsByTypeQuery query) {
@@ -30,7 +35,6 @@ public class GetNotificationsByTypeQueryHandler {
         List<Notification> notifications = notificationRepository
                 .findByUserIdAndTypeOrderByCreatedAtDesc(query.getUserId(), type);
 
-        // TODO: Mapear a DTOs cuando tengamos mapper
-        return null;
+        return notificationMapper.toDTOList(notifications);
     }
 }
