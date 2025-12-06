@@ -1,7 +1,7 @@
 package com.zentry.zentrystore.application.rating.command;
 
-
 import com.zentry.zentrystore.application.rating.dto.RatingDTO;
+import com.zentry.zentrystore.application.rating.mapper.RatingMapper;
 import com.zentry.zentrystore.domain.publication.exception.PublicationNotFoundException;
 import com.zentry.zentrystore.domain.publication.model.Publication;
 import com.zentry.zentrystore.domain.publication.repository.PublicationRepository;
@@ -20,13 +20,17 @@ public class CreateRatingCommandHandler {
     private final RatingRepository ratingRepository;
     private final UserRepository userRepository;
     private final PublicationRepository publicationRepository;
+    private final RatingMapper ratingMapper;
 
-    public CreateRatingCommandHandler(RatingRepository ratingRepository,
-                                      UserRepository userRepository,
-                                      PublicationRepository publicationRepository) {
+    public CreateRatingCommandHandler(
+            RatingRepository ratingRepository,
+            UserRepository userRepository,
+            PublicationRepository publicationRepository,
+            RatingMapper ratingMapper) {
         this.ratingRepository = ratingRepository;
         this.userRepository = userRepository;
         this.publicationRepository = publicationRepository;
+        this.ratingMapper = ratingMapper;
     }
 
     @Transactional
@@ -75,9 +79,7 @@ public class CreateRatingCommandHandler {
         Rating savedRating = ratingRepository.save(rating);
 
         // TODO: Publicar evento RatingCreatedEvent
-        // TODO: Enviar notificación al usuario calificado
 
-        // Retornar DTO
-        return null; // TODO: Mapear cuando tengamos mapper
+        return ratingMapper.toDTO(savedRating);
     }
 }

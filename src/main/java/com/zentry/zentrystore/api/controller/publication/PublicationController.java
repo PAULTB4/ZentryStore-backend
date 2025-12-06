@@ -3,6 +3,8 @@ package com.zentry.zentrystore.api.controller.publication;
 import com.zentry.zentrystore.application.publication.command.*;
 import com.zentry.zentrystore.application.publication.dto.*;
 import com.zentry.zentrystore.application.publication.query.*;
+import com.zentry.zentrystore.domain.publication.model.ProductImage;
+import com.zentry.zentrystore.domain.publication.model.Publication;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/publications")
@@ -92,6 +95,27 @@ public class PublicationController {
         PublicationResponse response = createPublicationCommandHandler.handle(command);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
+    public PublicationSummaryDTO toSummaryDto(Publication publication) {
+        PublicationSummaryDTO dto = new PublicationSummaryDTO();
+        dto.setId(publication.getId());
+        dto.setTitle(publication.getTitle());
+        dto.setCondition(publication.getCondition());
+        dto.setPrice(publication.getPrice().getAmount());
+        dto.setCurrency(publication.getPrice().getCurrency());
+        dto.setCity(publication.getLocation().getCity());
+        dto.setState(publication.getLocation().getState());
+        dto.setUsername(publication.getUser().getUsername()); // <– importante
+        dto.setImageUrls(
+                publication.getImages().stream()
+                        .map(ProductImage::getImageUrl)
+                        .collect(Collectors.toList())
+        );
+
+        dto.setCreatedAt(publication.getCreatedAt().toString());
+        return dto;
+    }
+
 
     @PutMapping("/{id}")
     public ResponseEntity<PublicationDTO> updatePublication(
@@ -201,22 +225,26 @@ public class PublicationController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<PublicationDTO>> searchPublications(
+    public ResponseEntity<List<PublicationSummaryDTO>> searchPublications(
             @RequestParam String keyword,
             @RequestParam(required = false) Long categoryId,
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice,
             @RequestParam(required = false) String city,
-            @RequestParam(required = false) String condition) {
+            @RequestParam(required = false) String condition,
+            @RequestParam(required = false) Boolean freeShipping,
+            @RequestParam(required = false, defaultValue = "createdAt") String sortBy,
+            @RequestParam(required = false, defaultValue = "desc") String order) {
         SearchPublicationsQuery query = new SearchPublicationsQuery(
                 keyword,
                 categoryId,
                 minPrice,
                 maxPrice,
                 city,
-                condition
+                condition,
+                freeShipping, sortBy, order
         );
-        List<PublicationDTO> response = searchPublicationsQueryHandler.handle(query);
+        List<PublicationSummaryDTO> response = searchPublicationsQueryHandler.handle(query);
         return ResponseEntity.ok(response);
     }
 

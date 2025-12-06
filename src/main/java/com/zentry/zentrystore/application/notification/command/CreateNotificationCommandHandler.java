@@ -1,6 +1,7 @@
 package com.zentry.zentrystore.application.notification.command;
 
 import com.zentry.zentrystore.application.notification.dto.NotificationDTO;
+import com.zentry.zentrystore.application.notification.mapper.NotificationMapper;
 import com.zentry.zentrystore.domain.notification.model.Notification;
 import com.zentry.zentrystore.domain.notification.model.NotificationType;
 import com.zentry.zentrystore.domain.notification.repository.NotificationRepository;
@@ -15,11 +16,15 @@ public class CreateNotificationCommandHandler {
 
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
+    private final NotificationMapper notificationMapper;
 
-    public CreateNotificationCommandHandler(NotificationRepository notificationRepository,
-                                            UserRepository userRepository) {
+    public CreateNotificationCommandHandler(
+            NotificationRepository notificationRepository,
+            UserRepository userRepository,
+            NotificationMapper notificationMapper) {
         this.notificationRepository = notificationRepository;
         this.userRepository = userRepository;
+        this.notificationMapper = notificationMapper;
     }
 
     @Transactional
@@ -62,7 +67,6 @@ public class CreateNotificationCommandHandler {
         // TODO: Publicar evento NotificationCreatedEvent
         // TODO: Enviar push notification si el usuario lo tiene habilitado
 
-        // Retornar DTO
-        return null; // TODO: Mapear cuando tengamos mapper
+        return notificationMapper.toDTO(savedNotification);
     }
 }

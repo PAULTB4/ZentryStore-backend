@@ -148,4 +148,40 @@ public class PublicationMapper {
 
         return dto;
     }
+
+    public PublicationSummaryDTO toSummaryDto(Publication publication) {
+        PublicationSummaryDTO dto = new PublicationSummaryDTO();
+
+        dto.setId(publication.getId());
+        dto.setTitle(publication.getTitle());
+        dto.setCondition(publication.getCondition());
+
+        if (publication.getPrice() != null) {
+            dto.setPrice(publication.getPrice().getAmount());
+            dto.setCurrency(publication.getPrice().getCurrency());
+        }
+
+        if (publication.getLocation() != null) {
+            dto.setCity(publication.getLocation().getCity());
+            dto.setState(publication.getLocation().getState());
+        }
+
+        if (publication.getUser() != null) {
+            dto.setUsername(publication.getUser().getUsername());
+        }
+
+        if (publication.getImages() != null && !publication.getImages().isEmpty()) {
+            List<String> imageUrls = publication.getImages().stream()
+                    .map(ProductImage::getImageUrl)
+                    .collect(Collectors.toList());
+            dto.setImageUrls(imageUrls);
+        }
+
+        if (publication.getCreatedAt() != null) {
+            dto.setCreatedAt(publication.getCreatedAt().toString());
+        }
+
+        return dto;
+    }
+
 }

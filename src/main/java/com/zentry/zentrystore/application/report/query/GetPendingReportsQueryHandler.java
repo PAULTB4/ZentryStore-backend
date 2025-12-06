@@ -1,6 +1,7 @@
 package com.zentry.zentrystore.application.report.query;
 
 import com.zentry.zentrystore.application.report.dto.ReportDTO;
+import com.zentry.zentrystore.application.report.mapper.ReportMapper;
 import com.zentry.zentrystore.domain.report.model.Report;
 import com.zentry.zentrystore.domain.report.model.ReportStatus;
 import com.zentry.zentrystore.domain.report.repository.ReportRepository;
@@ -14,15 +15,17 @@ import java.util.List;
 public class GetPendingReportsQueryHandler {
 
     private final ReportRepository reportRepository;
+    private final ReportMapper reportMapper;
 
-    public GetPendingReportsQueryHandler(ReportRepository reportRepository) {
+    public GetPendingReportsQueryHandler(
+            ReportRepository reportRepository,
+            ReportMapper reportMapper) {
         this.reportRepository = reportRepository;
+        this.reportMapper = reportMapper;
     }
 
     public List<ReportDTO> handle(GetPendingReportsQuery query) {
         List<Report> reports = reportRepository.findByStatus(ReportStatus.PENDING);
-
-        // TODO: Mapear a DTOs cuando tengamos mapper
-        return null;
+        return reportMapper.toDTOList(reports);
     }
 }
