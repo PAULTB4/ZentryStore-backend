@@ -7,6 +7,7 @@ import com.zentry.zentrystore.application.report.query.*;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -48,10 +49,8 @@ public class ReportController {
         this.getReportCountByEntityQueryHandler = getReportCountByEntityQueryHandler;
     }
 
-    /**
-     * POST /api/reports
-     * Crear un nuevo reporte
-     */
+    // ✅ Cualquier usuario autenticado puede crear reportes
+    @PreAuthorize("isAuthenticated()")
     @PostMapping
     public ResponseEntity<ReportDTO> createReport(
             @Valid @RequestBody CreateReportRequest request,
@@ -70,10 +69,8 @@ public class ReportController {
         return ResponseEntity.status(HttpStatus.CREATED).body(report);
     }
 
-    /**
-     * GET /api/reports/{id}
-     * Obtener reporte por ID
-     */
+    // ✅ Solo ADMIN puede ver reportes
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<ReportDTO> getReportById(@PathVariable Long id) {
 
@@ -83,10 +80,8 @@ public class ReportController {
         return ResponseEntity.ok(report);
     }
 
-    /**
-     * GET /api/reports/entity
-     * Obtener reportes de una entidad específica
-     */
+    // ✅ Solo ADMIN
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/entity")
     public ResponseEntity<List<ReportDTO>> getReportsByEntity(
             @RequestParam String entityType,
@@ -98,10 +93,8 @@ public class ReportController {
         return ResponseEntity.ok(reports);
     }
 
-    /**
-     * GET /api/reports/entity/count
-     * Contar reportes de una entidad
-     */
+    // ✅ Solo ADMIN
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/entity/count")
     public ResponseEntity<Map<String, Long>> getReportCountByEntity(
             @RequestParam String entityType,
@@ -113,10 +106,8 @@ public class ReportController {
         return ResponseEntity.ok(Map.of("count", count));
     }
 
-    /**
-     * GET /api/reports/status/{status}
-     * Obtener reportes por estado
-     */
+    // ✅ Solo ADMIN
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/status/{status}")
     public ResponseEntity<List<ReportDTO>> getReportsByStatus(@PathVariable String status) {
 
@@ -126,10 +117,8 @@ public class ReportController {
         return ResponseEntity.ok(reports);
     }
 
-    /**
-     * GET /api/reports/type/{type}
-     * Obtener reportes por tipo
-     */
+    // ✅ Solo ADMIN
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/type/{type}")
     public ResponseEntity<List<ReportDTO>> getReportsByType(@PathVariable String type) {
 
@@ -139,10 +128,8 @@ public class ReportController {
         return ResponseEntity.ok(reports);
     }
 
-    /**
-     * GET /api/reports/pending
-     * Obtener todos los reportes pendientes
-     */
+    // ✅ Solo ADMIN
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/pending")
     public ResponseEntity<List<ReportDTO>> getPendingReports() {
 
@@ -152,10 +139,8 @@ public class ReportController {
         return ResponseEntity.ok(reports);
     }
 
-    /**
-     * PATCH /api/reports/{id}/status
-     * Actualizar estado de un reporte
-     */
+    // ✅ Solo ADMIN puede actualizar status de reportes
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PatchMapping("/{id}/status")
     public ResponseEntity<ReportDTO> updateReportStatus(
             @PathVariable Long id,
@@ -174,10 +159,8 @@ public class ReportController {
         return ResponseEntity.ok(report);
     }
 
-    /**
-     * DELETE /api/reports/{id}
-     * Eliminar un reporte
-     */
+    // ✅ Solo ADMIN puede eliminar reportes
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteReport(
             @PathVariable Long id,

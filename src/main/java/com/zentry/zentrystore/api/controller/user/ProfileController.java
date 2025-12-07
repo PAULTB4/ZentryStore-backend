@@ -9,6 +9,7 @@ import com.zentry.zentrystore.application.user.query.GetUserProfileQuery;
 import com.zentry.zentrystore.application.user.query.GetUserProfileQueryHandler;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -25,6 +26,8 @@ public class ProfileController {
         this.updateUserProfileCommandHandler = updateUserProfileCommandHandler;
     }
 
+    // ✅ Cualquier usuario autenticado puede ver perfiles
+    @PreAuthorize("isAuthenticated()")
     @GetMapping
     public ResponseEntity<UserProfileResponse> getProfile(@PathVariable Long userId) {
         GetUserProfileQuery query = new GetUserProfileQuery(userId);
@@ -32,6 +35,8 @@ public class ProfileController {
         return ResponseEntity.ok(response);
     }
 
+    // ✅ Solo usuario autenticado (validación de ownership en Handler)
+    @PreAuthorize("isAuthenticated()")
     @PutMapping
     public ResponseEntity<UserResponse> updateProfile(
             @PathVariable Long userId,

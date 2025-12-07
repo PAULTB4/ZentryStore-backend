@@ -5,8 +5,8 @@ import java.util.List;
 public class AuthResponse {
 
     private Long userId;
-    private String username;      // ← Agrega este
-    private String email;         // ← Agrega este
+    private String username;
+    private String email;
     private String token;
     private List<String> roles;
 
