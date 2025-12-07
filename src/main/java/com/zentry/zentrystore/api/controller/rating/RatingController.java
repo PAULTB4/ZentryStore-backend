@@ -9,6 +9,7 @@ import com.zentry.zentrystore.application.rating.query.*;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -53,10 +54,8 @@ public class RatingController {
         this.ratingMapper = ratingMapper;
     }
 
-    /**
-     * POST /api/ratings
-     * Crear una nueva calificación
-     */
+    // ✅ Solo usuarios autenticados
+    @PreAuthorize("isAuthenticated()")
     @PostMapping
     public ResponseEntity<RatingDTO> createRating(
             @Valid @RequestBody CreateRatingRequest request,
@@ -78,10 +77,8 @@ public class RatingController {
         return ResponseEntity.status(HttpStatus.CREATED).body(rating);
     }
 
-    /**
-     * PUT /api/ratings/{id}
-     * Actualizar una calificación existente
-     */
+    // ✅ Solo usuarios autenticados (validación ownership en Handler)
+    @PreAuthorize("isAuthenticated()")
     @PutMapping("/{id}")
     public ResponseEntity<RatingDTO> updateRating(
             @PathVariable Long id,
@@ -103,10 +100,8 @@ public class RatingController {
         return ResponseEntity.ok(rating);
     }
 
-    /**
-     * DELETE /api/ratings/{id}
-     * Eliminar (ocultar) una calificación
-     */
+    // ✅ Solo usuarios autenticados (validación ownership en Handler)
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteRating(
             @PathVariable Long id,
@@ -118,10 +113,8 @@ public class RatingController {
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * POST /api/ratings/{id}/helpful
-     * Marcar una calificación como útil
-     */
+    // ✅ Solo usuarios autenticados
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/{id}/helpful")
     public ResponseEntity<Map<String, String>> markAsHelpful(
             @PathVariable Long id,
@@ -133,10 +126,7 @@ public class RatingController {
         return ResponseEntity.ok(Map.of("message", "Rating marked as helpful"));
     }
 
-    /**
-     * GET /api/ratings/user/{userId}
-     * Obtener calificaciones recibidas por un usuario
-     */
+    // ✅ PÚBLICO - Cualquiera puede ver ratings de usuarios
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<RatingDTO>> getRatingsByUser(@PathVariable Long userId) {
 
@@ -146,10 +136,7 @@ public class RatingController {
         return ResponseEntity.ok(ratings);
     }
 
-    /**
-     * GET /api/ratings/publication/{publicationId}
-     * Obtener calificaciones de una publicación
-     */
+    // ✅ PÚBLICO - Cualquiera puede ver ratings de publicaciones
     @GetMapping("/publication/{publicationId}")
     public ResponseEntity<List<RatingDTO>> getRatingsByPublication(@PathVariable Long publicationId) {
 
@@ -159,10 +146,7 @@ public class RatingController {
         return ResponseEntity.ok(ratings);
     }
 
-    /**
-     * GET /api/ratings/user/{userId}/average
-     * Obtener promedio de calificaciones de un usuario
-     */
+    // ✅ PÚBLICO - Ver promedio de un usuario
     @GetMapping("/user/{userId}/average")
     public ResponseEntity<Map<String, Double>> getAverageRatingByUser(@PathVariable Long userId) {
 
@@ -172,10 +156,7 @@ public class RatingController {
         return ResponseEntity.ok(Map.of("averageRating", average));
     }
 
-    /**
-     * GET /api/ratings/publication/{publicationId}/average
-     * Obtener promedio de calificaciones de una publicación
-     */
+    // ✅ PÚBLICO - Ver promedio de una publicación
     @GetMapping("/publication/{publicationId}/average")
     public ResponseEntity<Map<String, Double>> getAverageRatingByPublication(@PathVariable Long publicationId) {
 
@@ -185,10 +166,7 @@ public class RatingController {
         return ResponseEntity.ok(Map.of("averageRating", average));
     }
 
-    /**
-     * GET /api/ratings/publication/{publicationId}/statistics
-     * Obtener estadísticas completas de calificaciones de una publicación
-     */
+    // ✅ PÚBLICO - Ver estadísticas de ratings
     @GetMapping("/publication/{publicationId}/statistics")
     public ResponseEntity<Map<String, Object>> getRatingStatistics(@PathVariable Long publicationId) {
 

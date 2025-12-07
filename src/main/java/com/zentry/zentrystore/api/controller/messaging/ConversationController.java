@@ -26,6 +26,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -63,10 +64,8 @@ public class ConversationController {
         this.messagingMapper = messagingMapper;
     }
 
-    /**
-     * POST /api/conversations
-     * Crear nueva conversación
-     */
+    // ✅ Solo usuarios autenticados
+    @PreAuthorize("isAuthenticated()")
     @PostMapping
     public ResponseEntity<ConversationDTO> createConversation(
             @Valid @RequestBody CreateConversationRequest request) {
@@ -86,10 +85,8 @@ public class ConversationController {
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
 
-    /**
-     * GET /api/conversations
-     * Obtener todas las conversaciones del usuario autenticado
-     */
+    // ✅ Solo usuarios autenticados (validación ownership en Handler)
+    @PreAuthorize("isAuthenticated()")
     @GetMapping
     public ResponseEntity<List<ConversationDTO>> getUserConversations(
             @RequestParam(defaultValue = "0") int page,
@@ -108,10 +105,8 @@ public class ConversationController {
         return ResponseEntity.ok(dtos);
     }
 
-    /**
-     * GET /api/conversations/{id}
-     * Obtener conversación por ID
-     */
+    // ✅ Solo usuarios autenticados (validación participante en Handler)
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}")
     public ResponseEntity<ConversationDTO> getConversationById(
             @PathVariable Long id,
@@ -123,10 +118,8 @@ public class ConversationController {
         return ResponseEntity.ok(dto);
     }
 
-    /**
-     * GET /api/conversations/between
-     * Obtener conversación entre dos usuarios específicos
-     */
+    // ✅ Solo usuarios autenticados
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/between")
     public ResponseEntity<ConversationDTO> getConversationBetweenUsers(
             @RequestParam Long otherUserId,
@@ -146,10 +139,8 @@ public class ConversationController {
         return ResponseEntity.ok(dto);
     }
 
-    /**
-     * GET /api/conversations/{id}/messages
-     * Obtener mensajes de una conversación (paginados)
-     */
+    // ✅ Solo usuarios autenticados (validación participante en Handler)
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}/messages")
     public ResponseEntity<List<MessageDTO>> getConversationMessages(
             @PathVariable Long id,
@@ -169,10 +160,8 @@ public class ConversationController {
         return ResponseEntity.ok(dtos);
     }
 
-    /**
-     * PATCH /api/conversations/{id}/archive
-     * Archivar/desarchivar conversación
-     */
+    // ✅ Solo usuarios autenticados (validación ownership en Handler)
+    @PreAuthorize("isAuthenticated()")
     @PatchMapping("/{id}/archive")
     public ResponseEntity<Void> archiveConversation(
             @PathVariable Long id,
@@ -190,10 +179,8 @@ public class ConversationController {
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * DELETE /api/conversations/{id}
-     * Eliminar conversación (soft delete)
-     */
+    // ✅ Solo usuarios autenticados (validación ownership en Handler)
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteConversation(
             @PathVariable Long id,

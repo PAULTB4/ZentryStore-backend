@@ -13,6 +13,7 @@ import com.zentry.zentrystore.application.favorite.query.GetUserFavoritesQuery;
 import com.zentry.zentrystore.application.favorite.query.GetUserFavoritesQueryHandler;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -43,10 +44,8 @@ public class FavoriteController {
         this.getFavoriteCountByPublicationQueryHandler = getFavoriteCountByPublicationQueryHandler;
     }
 
-    /**
-     * POST /api/favorites
-     * Agregar publicación a favoritos
-     */
+    // ✅ Solo usuarios autenticados (validación ownership en Handler)
+    @PreAuthorize("isAuthenticated()")
     @PostMapping
     public ResponseEntity<FavoriteDTO> addFavorite(
             @RequestParam Long userId,
@@ -58,10 +57,8 @@ public class FavoriteController {
         return ResponseEntity.status(HttpStatus.CREATED).body(favorite);
     }
 
-    /**
-     * DELETE /api/favorites
-     * Quitar publicación de favoritos
-     */
+    // ✅ Solo usuarios autenticados (validación ownership en Handler)
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping
     public ResponseEntity<Void> removeFavorite(
             @RequestParam Long userId,
@@ -73,10 +70,8 @@ public class FavoriteController {
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * GET /api/favorites/user/{userId}
-     * Obtener favoritos de un usuario
-     */
+    // ✅ Solo usuarios autenticados (validación ownership en Handler)
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<FavoriteDTO>> getUserFavorites(@PathVariable Long userId) {
 
@@ -86,10 +81,8 @@ public class FavoriteController {
         return ResponseEntity.ok(favorites);
     }
 
-    /**
-     * GET /api/favorites/check
-     * Verificar si una publicación es favorita del usuario
-     */
+    // ✅ Solo usuarios autenticados
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/check")
     public ResponseEntity<Map<String, Boolean>> checkIfFavorite(
             @RequestParam Long userId,
@@ -104,10 +97,8 @@ public class FavoriteController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * GET /api/favorites/publication/{publicationId}/count
-     * Obtener número de usuarios que marcaron como favorita una publicación
-     */
+    // ✅ Solo usuarios autenticados
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/publication/{publicationId}/count")
     public ResponseEntity<Map<String, Long>> getFavoriteCount(
             @PathVariable Long publicationId) {
