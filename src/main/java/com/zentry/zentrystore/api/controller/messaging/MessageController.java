@@ -14,6 +14,7 @@ import com.zentry.zentrystore.application.messaging.query.GetUnreadMessagesCount
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -43,10 +44,8 @@ public class MessageController {
         this.messagingMapper = messagingMapper;
     }
 
-    /**
-     * POST /api/messages
-     * Enviar un nuevo mensaje
-     */
+    // ✅ Solo usuarios autenticados
+    @PreAuthorize("isAuthenticated()")
     @PostMapping
     public ResponseEntity<MessageDTO> sendMessage(
             @Valid @RequestBody SendMessageRequest request) {
@@ -64,10 +63,8 @@ public class MessageController {
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
 
-    /**
-     * PATCH /api/messages/{id}/read
-     * Marcar mensaje como leído
-     */
+    // ✅ Solo usuarios autenticados
+    @PreAuthorize("isAuthenticated()")
     @PatchMapping("/{id}/read")
     public ResponseEntity<Void> markMessageAsRead(
             @PathVariable Long id,
@@ -79,10 +76,8 @@ public class MessageController {
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * DELETE /api/messages/{id}
-     * Eliminar mensaje (soft delete)
-     */
+    // ✅ Solo usuarios autenticados (validación ownership en Handler)
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMessage(
             @PathVariable Long id,
@@ -94,10 +89,8 @@ public class MessageController {
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * GET /api/messages/unread/count
-     * Obtener contador de mensajes no leídos del usuario
-     */
+    // ✅ Solo usuarios autenticados
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/unread/count")
     public ResponseEntity<Map<String, Long>> getUnreadMessagesCount(
             @RequestParam Long userId) {

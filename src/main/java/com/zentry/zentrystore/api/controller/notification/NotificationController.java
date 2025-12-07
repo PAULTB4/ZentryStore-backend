@@ -7,6 +7,7 @@ import com.zentry.zentrystore.application.notification.query.*;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -45,10 +46,8 @@ public class NotificationController {
         this.getNotificationsByTypeQueryHandler = getNotificationsByTypeQueryHandler;
     }
 
-    /**
-     * POST /api/notifications
-     * Crear una nueva notificación
-     */
+    // ✅ Solo usuarios autenticados
+    @PreAuthorize("isAuthenticated()")
     @PostMapping
     public ResponseEntity<NotificationDTO> createNotification(
             @Valid @RequestBody CreateNotificationRequest request) {
@@ -68,10 +67,8 @@ public class NotificationController {
         return ResponseEntity.status(HttpStatus.CREATED).body(notification);
     }
 
-    /**
-     * GET /api/notifications/user/{userId}
-     * Obtener notificaciones de un usuario
-     */
+    // ✅ Solo usuarios autenticados (validación ownership en Handler)
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<NotificationDTO>> getUserNotifications(
             @PathVariable Long userId,
@@ -83,10 +80,8 @@ public class NotificationController {
         return ResponseEntity.ok(notifications);
     }
 
-    /**
-     * GET /api/notifications/user/{userId}/unread
-     * Obtener notificaciones no leídas de un usuario
-     */
+    // ✅ Solo usuarios autenticados (validación ownership en Handler)
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/user/{userId}/unread")
     public ResponseEntity<List<NotificationDTO>> getUnreadNotifications(@PathVariable Long userId) {
 
@@ -96,10 +91,8 @@ public class NotificationController {
         return ResponseEntity.ok(notifications);
     }
 
-    /**
-     * GET /api/notifications/user/{userId}/unread/count
-     * Contar notificaciones no leídas
-     */
+    // ✅ Solo usuarios autenticados (validación ownership en Handler)
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/user/{userId}/unread/count")
     public ResponseEntity<Map<String, Long>> getUnreadNotificationsCount(@PathVariable Long userId) {
 
@@ -109,10 +102,8 @@ public class NotificationController {
         return ResponseEntity.ok(Map.of("count", count));
     }
 
-    /**
-     * GET /api/notifications/user/{userId}/type/{type}
-     * Obtener notificaciones por tipo
-     */
+    // ✅ Solo usuarios autenticados (validación ownership en Handler)
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/user/{userId}/type/{type}")
     public ResponseEntity<List<NotificationDTO>> getNotificationsByType(
             @PathVariable Long userId,
@@ -124,10 +115,8 @@ public class NotificationController {
         return ResponseEntity.ok(notifications);
     }
 
-    /**
-     * PATCH /api/notifications/{id}/read
-     * Marcar notificación como leída
-     */
+    // ✅ Solo usuarios autenticados (validación ownership en Handler)
+    @PreAuthorize("isAuthenticated()")
     @PatchMapping("/{id}/read")
     public ResponseEntity<Map<String, String>> markNotificationAsRead(
             @PathVariable Long id,
@@ -139,10 +128,8 @@ public class NotificationController {
         return ResponseEntity.ok(Map.of("message", "Notification marked as read"));
     }
 
-    /**
-     * PATCH /api/notifications/user/{userId}/read-all
-     * Marcar todas las notificaciones como leídas
-     */
+    // ✅ Solo usuarios autenticados (validación ownership en Handler)
+    @PreAuthorize("isAuthenticated()")
     @PatchMapping("/user/{userId}/read-all")
     public ResponseEntity<Map<String, String>> markAllNotificationsAsRead(@PathVariable Long userId) {
 
@@ -152,10 +139,8 @@ public class NotificationController {
         return ResponseEntity.ok(Map.of("message", "All notifications marked as read"));
     }
 
-    /**
-     * DELETE /api/notifications/{id}
-     * Eliminar una notificación
-     */
+    // ✅ Solo usuarios autenticados (validación ownership en Handler)
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteNotification(
             @PathVariable Long id,

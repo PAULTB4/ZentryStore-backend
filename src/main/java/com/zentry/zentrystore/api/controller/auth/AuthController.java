@@ -26,6 +26,7 @@ public class AuthController {
         this.loginCommandHandler = loginCommandHandler;
     }
 
+    // ✅ PÚBLICO - Configurado en SecurityConfig
     @PostMapping("/register")
     public ResponseEntity<UserResponse> register(@Valid @RequestBody RegisterRequest request) {
         RegisterUserCommand command = new RegisterUserCommand(
@@ -38,6 +39,7 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    // ✅ PÚBLICO - Configurado en SecurityConfig
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         LoginCommand command = new LoginCommand(
@@ -49,9 +51,9 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    // ✅ PÚBLICO
     @PostMapping("/logout")
     public ResponseEntity<Void> logout() {
-        // TODO: Invalidar JWT token
         return ResponseEntity.noContent().build();
     }
 }

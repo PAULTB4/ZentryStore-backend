@@ -8,6 +8,7 @@ import com.zentry.zentrystore.domain.publication.model.Publication;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -18,13 +19,10 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/publications")
 public class PublicationController {
 
-    // Command Handlers
     private final CreatePublicationCommandHandler createPublicationCommandHandler;
     private final UpdatePublicationCommandHandler updatePublicationCommandHandler;
     private final DeletePublicationCommandHandler deletePublicationCommandHandler;
     private final ChangePublicationStatusCommandHandler changePublicationStatusCommandHandler;
-
-    // Query Handlers
     private final GetPublicationByIdQueryHandler getPublicationByIdQueryHandler;
     private final GetRecentPublicationsQueryHandler getRecentPublicationsQueryHandler;
     private final GetActivePublicationsQueryHandler getActivePublicationsQueryHandler;
@@ -65,9 +63,11 @@ public class PublicationController {
     }
 
     // =============================================
-    // COMMANDS (POST, PUT, PATCH, DELETE)
+    // COMMANDS - SOLO SELLERS
     // =============================================
 
+    // ✅ Solo SELLER puede crear publicaciones
+    @PreAuthorize("hasRole('ROLE_SELLER')")
     @PostMapping
     public ResponseEntity<PublicationResponse> createPublication(
             @Valid @RequestBody CreatePublicationRequest request) {
@@ -96,27 +96,8 @@ public class PublicationController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    public PublicationSummaryDTO toSummaryDto(Publication publication) {
-        PublicationSummaryDTO dto = new PublicationSummaryDTO();
-        dto.setId(publication.getId());
-        dto.setTitle(publication.getTitle());
-        dto.setCondition(publication.getCondition());
-        dto.setPrice(publication.getPrice().getAmount());
-        dto.setCurrency(publication.getPrice().getCurrency());
-        dto.setCity(publication.getLocation().getCity());
-        dto.setState(publication.getLocation().getState());
-        dto.setUsername(publication.getUser().getUsername()); // <– importante
-        dto.setImageUrls(
-                publication.getImages().stream()
-                        .map(ProductImage::getImageUrl)
-                        .collect(Collectors.toList())
-        );
-
-        dto.setCreatedAt(publication.getCreatedAt().toString());
-        return dto;
-    }
-
-
+    // ✅ Solo SELLER (validación de ownership en Handler)
+    @PreAuthorize("hasRole('ROLE_SELLER')")
     @PutMapping("/{id}")
     public ResponseEntity<PublicationDTO> updatePublication(
             @PathVariable Long id,
@@ -146,6 +127,8 @@ public class PublicationController {
         return ResponseEntity.ok(response);
     }
 
+    // ✅ SELLER o ADMIN (validación en Handler)
+    @PreAuthorize("hasRole('ROLE_SELLER') or hasRole('ROLE_ADMIN')")
     @PatchMapping("/{id}/status")
     public ResponseEntity<PublicationDTO> changeStatus(
             @PathVariable Long id,
@@ -156,6 +139,8 @@ public class PublicationController {
         return ResponseEntity.ok(response);
     }
 
+    // ✅ SELLER o ADMIN (validación en Handler)
+    @PreAuthorize("hasRole('ROLE_SELLER') or hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePublication(@PathVariable Long id) {
         DeletePublicationCommand command = new DeletePublicationCommand(id);
@@ -164,9 +149,10 @@ public class PublicationController {
     }
 
     // =============================================
-    // QUERIES (GET)
+    // QUERIES - PÚBLICOS (configurados en SecurityConfig)
     // =============================================
 
+    // ✅ PÚBLICO - Sin anotación (SecurityConfig lo permite)
     @GetMapping("/{id}")
     public ResponseEntity<PublicationDTO> getPublicationById(@PathVariable Long id) {
         GetPublicationByIdQuery query = new GetPublicationByIdQuery(id);
@@ -174,6 +160,7 @@ public class PublicationController {
         return ResponseEntity.ok(response);
     }
 
+    // ✅ PÚBLICO
     @GetMapping("/recent")
     public ResponseEntity<List<PublicationResponse>> getRecentPublications(
             @RequestParam(defaultValue = "10") int limit) {
@@ -182,6 +169,7 @@ public class PublicationController {
         return ResponseEntity.ok(response);
     }
 
+    // ✅ PÚBLICO
     @GetMapping("/active")
     public ResponseEntity<List<PublicationDTO>> getActivePublications(
             @RequestParam(defaultValue = "20") int limit) {
@@ -190,6 +178,7 @@ public class PublicationController {
         return ResponseEntity.ok(response);
     }
 
+    // ✅ PÚBLICO
     @GetMapping("/featured")
     public ResponseEntity<List<PublicationDTO>> getFeaturedPublications(
             @RequestParam(defaultValue = "10") int limit) {
@@ -198,6 +187,7 @@ public class PublicationController {
         return ResponseEntity.ok(response);
     }
 
+    // ✅ PÚBLICO
     @GetMapping("/category/{categoryId}")
     public ResponseEntity<List<PublicationDTO>> getPublicationsByCategory(
             @PathVariable Long categoryId,
@@ -207,6 +197,8 @@ public class PublicationController {
         return ResponseEntity.ok(response);
     }
 
+    // ✅ Autenticado para ver publicaciones de un usuario específico
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<PublicationDTO>> getPublicationsByUser(
             @PathVariable Long userId) {
@@ -215,6 +207,7 @@ public class PublicationController {
         return ResponseEntity.ok(response);
     }
 
+    // ✅ PÚBLICO
     @GetMapping("/location")
     public ResponseEntity<List<PublicationResponse>> getPublicationsByLocation(
             @RequestParam String city,
@@ -224,6 +217,7 @@ public class PublicationController {
         return ResponseEntity.ok(response);
     }
 
+    // ✅ PÚBLICO
     @GetMapping("/search")
     public ResponseEntity<List<PublicationSummaryDTO>> searchPublications(
             @RequestParam String keyword,
@@ -248,10 +242,30 @@ public class PublicationController {
         return ResponseEntity.ok(response);
     }
 
+    // ✅ PÚBLICO
     @GetMapping("/categories")
     public ResponseEntity<List<CategoryDTO>> getAllCategories() {
         GetAllCategoriesQuery query = new GetAllCategoriesQuery();
         List<CategoryDTO> response = getAllCategoriesQueryHandler.handle(query);
         return ResponseEntity.ok(response);
+    }
+
+    public PublicationSummaryDTO toSummaryDto(Publication publication) {
+        PublicationSummaryDTO dto = new PublicationSummaryDTO();
+        dto.setId(publication.getId());
+        dto.setTitle(publication.getTitle());
+        dto.setCondition(publication.getCondition());
+        dto.setPrice(publication.getPrice().getAmount());
+        dto.setCurrency(publication.getPrice().getCurrency());
+        dto.setCity(publication.getLocation().getCity());
+        dto.setState(publication.getLocation().getState());
+        dto.setUsername(publication.getUser().getUsername());
+        dto.setImageUrls(
+                publication.getImages().stream()
+                        .map(ProductImage::getImageUrl)
+                        .collect(Collectors.toList())
+        );
+        dto.setCreatedAt(publication.getCreatedAt().toString());
+        return dto;
     }
 }
